@@ -1,2 +1,2 @@
 # Synthesis
-Synthesis of implamentations for divide-and-conquer specifications
+Synthesis of implementations for divide-and-conquer specifications
