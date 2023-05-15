@@ -18,13 +18,10 @@ theory Scheduling
 begin
 
 
-datatype job = Rec nat nat
+record job =
+ val  :: nat
+ date :: nat
 
-fun val :: "job \<Rightarrow> nat"
-  where "val (Rec d v) = v"
-
-fun date :: "job \<Rightarrow> nat"
-  where "date (Rec d v) = d"
 
 
 fun adm' :: "nat \<Rightarrow> job list \<Rightarrow> bool"
@@ -355,10 +352,10 @@ lemma fm[simp]: "finite_matroids scheduling.\<L>_img" by(unfold_locales, rule jo
 
 section "The example"
 
-definition "j\<^sub>1 = Rec 2 50"
-definition "j\<^sub>2 = Rec 1 10"
-definition "j\<^sub>3 = Rec 2 15"
-definition "j\<^sub>4 = Rec 1 30"
+definition "j\<^sub>1 = \<lparr> val = 50, date = 2 \<rparr>"
+definition "j\<^sub>2 = \<lparr> val = 10, date = 1 \<rparr>"
+definition "j\<^sub>3 = \<lparr> val = 15, date = 2 \<rparr>"
+definition "j\<^sub>4 = \<lparr> val = 30, date = 1 \<rparr>"
 
 lemma example_eval : 
 "scheduling.greedy_tr adm ins [j\<^sub>1, j\<^sub>4, j\<^sub>3, j\<^sub>2] [] = [j\<^sub>4, j\<^sub>1]"
@@ -378,12 +375,12 @@ lemma example_conclusion :
 
 text "Interpreted in this particular setting:"
 lemma
-"distinct xs \<Longrightarrow> set xs \<subseteq> {j\<^sub>1, j\<^sub>4, j\<^sub>3, j\<^sub>2} \<Longrightarrow> xs \<in> adm \<Longrightarrow>
+"distinct xs \<Longrightarrow> set xs \<subseteq> {j\<^sub>1, j\<^sub>4, j\<^sub>3, j\<^sub>2} \<Longrightarrow> xs \<in> \<L>_job \<Longrightarrow>
  length xs \<le> 2 \<and> weight w_job (set xs) \<le> 80"
   apply(insert example_conclusion)
   apply(clarsimp simp: finite_matroids.max_weight_basis_def)
   apply(rule conjI)
-   apply (metis One_nat_def Suc_1 adm'_\<L>_job adm_def card.empty card.insert distinct_card finite_insert finite_matroids.basis_def fm insert_absorb le_SucI mem_Collect_eq scheduling.\<L>_img_eq)
+   apply (metis One_nat_def Suc_1 card.empty card.insert distinct_card finite_insert finite_matroids.basis_def fm insert_absorb le_SucI scheduling.\<L>_img_eq)
   apply(subgoal_tac "set xs \<in> scheduling.\<L>_img")
    apply(drule finite_matroids.basis_ext[OF fm], assumption, simp)
    apply clarify
@@ -394,14 +391,8 @@ lemma
     apply(simp add: w_job_def)
    apply(erule order_trans)
    apply(simp (no_asm) add: weight_def w_job_def j\<^sub>1_def j\<^sub>4_def)
-  apply(subst scheduling.\<L>_img_def)
-  apply(simp (no_asm) add: \<L>_job_def)
-  apply(rule_tac x=xs in exI, simp add: adm_def)
-  apply(erule adm')
-  apply(rule ins_sorted)
-  apply simp
-  by(erule dist_ins_fold)
-
+  apply(subst scheduling.\<L>_img_def, fast)
+  done
 
 
 end
