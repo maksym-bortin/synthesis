@@ -36,7 +36,7 @@ lemma Relt_mono:
   by(rule monoI, fast)
 
 lemma Relt_comp:
-  "Relt r O Relt s = Relt (r O s)"
+  "Relt r \<diamondop> Relt s = Relt (r \<diamondop> s)"
   unfolding Relt_def
   by(rule equalityI, blast+)
   
@@ -108,7 +108,7 @@ text "Note that we actually just copy-and-paste the respective section
       from the theory DaC-synthesis.thy"
 
 definition
-"DaC_scheme decompose compose = (\<lambda>r. decompose O Relt r O compose)"
+"DaC_scheme decompose compose = (\<lambda>r. decompose \<diamondop> Relt r \<diamondop> compose)"
 
 lemma DaC_mono :
 "decompose \<subseteq> decompose' \<Longrightarrow> compose \<subseteq> compose' \<Longrightarrow> r \<subseteq> r' \<Longrightarrow> 
@@ -128,9 +128,9 @@ locale DaC_synthesis =
 assumes
   DaC : "DaC_scheme abs_dcmp abs_cmp spec \<subseteq> spec"
 and
-  decomp : "\<alpha>\<^sub>1\<inverse> O (graphF dcmp) \<subseteq> abs_dcmp O Relt (\<alpha>\<^sub>1\<inverse>)"
+  decomp : "\<alpha>\<^sub>1\<inverse> \<diamondop> (graphF dcmp) \<subseteq> abs_dcmp \<diamondop> Relt (\<alpha>\<^sub>1\<inverse>)"
 and
-  comp   : "(graphF cmp) O \<alpha>\<^sub>2 \<subseteq> Relt \<alpha>\<^sub>2 O abs_cmp"
+  comp   : "(graphF cmp) \<diamondop> \<alpha>\<^sub>2 \<subseteq> Relt \<alpha>\<^sub>2 \<diamondop> abs_cmp"
 and
   reduct : "Id \<subseteq> lfp(\<lambda>x. monotypeF (graphF dcmp) (Relt x))"
 begin
@@ -174,11 +174,11 @@ lemma DaC_entire :
 "entire c \<Longrightarrow> entire(lfp(DaC_scheme (graphF dcmp) c))"
   apply(simp add: entire_def)
   apply(rule subset_trans, rule reduct)
-  apply(rule_tac H="\<lambda>x. x O x\<inverse>" in lfp_fusion)
+  apply(rule_tac H="\<lambda>x. x \<diamondop> x\<inverse>" in lfp_fusion)
   apply(rule monoI, rule DaC_mono, simp+)
   apply(rule allI)
-  apply(subgoal_tac "monotypeF (graphF dcmp) (Relt (x O x\<inverse>)) \<subseteq> 
-                    (monotypeF (graphF dcmp) (Relt (x O x\<inverse>)) O (graphF dcmp)) O (graphF dcmp)\<inverse>")
+  apply(subgoal_tac "monotypeF (graphF dcmp) (Relt (x \<diamondop> x\<inverse>)) \<subseteq> 
+                    (monotypeF (graphF dcmp) (Relt (x \<diamondop> x\<inverse>)) \<diamondop> (graphF dcmp)) \<diamondop> (graphF dcmp)\<inverse>")
    apply(erule subset_trans)
    apply(rule subset_trans)
     apply(rule relcomp_mono)
@@ -206,7 +206,7 @@ lemma DaC_entire :
 
 
 lemma DaC_impl :
-"\<alpha>\<^sub>1\<inverse> O lfp(DaC_scheme (graphF dcmp) (graphF cmp)) O \<alpha>\<^sub>2 \<subseteq> spec"
+"\<alpha>\<^sub>1\<inverse> \<diamondop> lfp(DaC_scheme (graphF dcmp) (graphF cmp)) \<diamondop> \<alpha>\<^sub>2 \<subseteq> spec"
   apply(subst O_assoc[THEN sym])
   apply(subst ldiv_univ)
   apply(subst rdiv_univ)
@@ -246,7 +246,7 @@ lemma DaC_impl :
 
 theorem DaC_synthesis :
 "\<exists>\<phi>. lfp(DaC_scheme (graphF dcmp) (graphF cmp)) = graphF \<phi> \<and>
-     \<alpha>\<^sub>1\<inverse> O graphF \<phi> O \<alpha>\<^sub>2 \<subseteq> spec"
+     \<alpha>\<^sub>1\<inverse> \<diamondop> graphF \<phi> \<diamondop> \<alpha>\<^sub>2 \<subseteq> spec"
   apply(subgoal_tac "\<exists>\<phi>. lfp(DaC_scheme (graphF dcmp) (graphF cmp)) = graphF \<phi>")
    apply clarify
    apply(rule exI, rule conjI, assumption)
@@ -275,7 +275,7 @@ lemma dac_lfp :
 
 
 lemma dac_unfold' :
-"graphF dac = (graphF dcmp) O Relt(graphF dac) O (graphF cmp)"
+"graphF dac = (graphF dcmp) \<diamondop> Relt(graphF dac) \<diamondop> (graphF cmp)"
 proof -
   have "graphF dac = lfp (DaC_scheme (graphF dcmp) (graphF cmp))" (is "?l = ?r")
     by (simp add: dac_lfp)
@@ -288,7 +288,7 @@ qed
 
 
 lemma dac_unq_function' :
-"(graphF dcmp) O Relt(graphF f) O (graphF cmp) \<subseteq> graphF f \<Longrightarrow> dac = f"
+"(graphF dcmp) \<diamondop> Relt(graphF f) \<diamondop> (graphF cmp) \<subseteq> graphF f \<Longrightarrow> dac = f"
   by (simp add: DaC_scheme_def dac_lfp graphF_sub lfp_lowerbound)
 
 
@@ -303,7 +303,7 @@ lemma dac_unq_function :
   
 
 lemma dac_impl :
-"\<alpha>\<^sub>1\<inverse> O (graphF dac) O \<alpha>\<^sub>2 \<subseteq> spec"
+"\<alpha>\<^sub>1\<inverse> \<diamondop> (graphF dac) \<diamondop> \<alpha>\<^sub>2 \<subseteq> spec"
   by (simp add: DaC_impl dac_lfp)
 
 

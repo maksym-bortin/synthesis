@@ -23,12 +23,15 @@ text "Arrows in this setting are relations between
       sets of values classified by the source and target types."
 type_synonym ('a, 'b) arrow = "('a \<times> 'b) set" ("_ \<rightarrow> _" [50, 50] 51)
 
+abbreviation relcomp'  :: "('a \<times> 'b) set \<Rightarrow> ('b \<times> 'c) set \<Rightarrow> ('a \<times> 'c) set"  (infixr "\<diamondop>" 75)
+  where "r \<diamondop> s \<equiv> r O s"
+
 
 definition ldiv :: "'a \<rightarrow> 'c \<Rightarrow> 'b \<rightarrow> 'c \<Rightarrow> 'a \<rightarrow> 'b" (infixl "ldiv" 55)
-  where "s ldiv r = \<Union>{x. x O r \<subseteq> s}"
+  where "s ldiv r = \<Union>{x. x \<diamondop> r \<subseteq> s}"
 
 lemma ldiv_univ :
-"(x O r \<subseteq> s) = (x \<subseteq> s ldiv r)"
+"(x \<diamondop> r \<subseteq> s) = (x \<subseteq> s ldiv r)"
   by(simp add: ldiv_def, rule iffI, blast+)
 
 lemma ldiv_mono :
@@ -41,10 +44,10 @@ lemma ldiv_mono2 :
 
 
 definition rdiv :: "'a \<rightarrow> 'b \<Rightarrow> 'a \<rightarrow> 'c \<Rightarrow> 'c \<rightarrow> 'b" (infixl "rdiv" 55)
-  where "s rdiv r = \<Union>{x. r O x \<subseteq> s}"
+  where "s rdiv r = \<Union>{x. r \<diamondop> x \<subseteq> s}"
 
 lemma rdiv_univ :
-"(r O x \<subseteq> s) = (x \<subseteq> s rdiv r)"
+"(r \<diamondop> x \<subseteq> s) = (x \<subseteq> s rdiv r)"
   by(simp add: rdiv_def, rule iffI, blast+)
 
 
@@ -85,7 +88,7 @@ lemma graphF_id :
 by(simp add: graphF_def, blast)
 
 lemma graphF_comp :
-  "graphF(g \<circ> f) = graphF f O graphF g"
+  "graphF(g \<circ> f) = graphF f \<diamondop> graphF g"
   by(simp add: graphF_def, blast)
 
 lemma graphF_eqD :
@@ -101,8 +104,8 @@ lemma graphF_sub :
 
 section "Simple and entire arrows"
 
-definition "simple r = (r\<inverse> O r \<subseteq> Id)"
-definition "entire r = (Id \<subseteq> r O r\<inverse>)"
+definition "simple r = (r\<inverse> \<diamondop> r \<subseteq> Id)"
+definition "entire r = (Id \<subseteq> r \<diamondop> r\<inverse>)"
 
 lemma mapping :
 "simple r \<Longrightarrow> entire r \<Longrightarrow> \<exists>f. r = graphF f"
@@ -122,18 +125,18 @@ lemma mapping :
 
 section "Monotype factor"
 
-definition "monotypeF r s = (r O s) ldiv r"
+definition "monotypeF r s = (r \<diamondop> s) ldiv r"
 
 lemma monotypeF_mono :
 "mono (monotypeF r)"
   by (simp add: ldiv_mono monoI monotypeF_def relcomp_mono) 
 
 lemma monotypeF_univ :
-"(x O r \<subseteq> r O s) = (x \<subseteq> monotypeF r s)"
+"(x \<diamondop> r \<subseteq> r \<diamondop> s) = (x \<subseteq> monotypeF r s)"
   by(simp add: monotypeF_def, rule ldiv_univ)
 
 lemma monotypeF1 :
-"monotypeF r s O r \<subseteq> r O s"
+"monotypeF r s \<diamondop> r \<subseteq> r \<diamondop> s"
   by(subst monotypeF_univ, simp)
 
 
