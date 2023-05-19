@@ -51,7 +51,7 @@ lemma Relt_Id:
   by (clarsimp, rule set_eqI, smt (verit, best) IdE IdI Relt.exhaust insert_iff mem_Collect_eq)
   
 lemma Relt_conv:
-"(Relt r)\<inverse> \<subseteq> Relt (r\<inverse>)"
+"(Relt r)\<^sup>\<circ> \<subseteq> Relt (r\<^sup>\<circ>)"
   unfolding Relt_def
   by blast
 
@@ -59,7 +59,7 @@ lemma Relt_conv:
 subsection "Derived properties"
 
 lemma Relt_conv_eq :
-"(Relt r)\<inverse> = Relt (r\<inverse>)"
+"(Relt r)\<^sup>\<circ> = Relt (r\<^sup>\<circ>)"
   by (metis Relt_conv converse_converse converse_subset_swap subset_antisym)
 
 
@@ -134,7 +134,7 @@ locale DaC_synthesis =
 assumes
   DaC : "DaC_scheme abs_dcmp abs_cmp spec \<subseteq> spec"
 and
-  decomp : "\<alpha>\<^sub>1\<inverse> \<diamondop> (graphF dcmp) \<subseteq> abs_dcmp \<diamondop> Relt (\<alpha>\<^sub>1\<inverse>)"
+  decomp : "\<alpha>\<^sub>1\<^sup>\<circ> \<diamondop> (graphF dcmp) \<subseteq> abs_dcmp \<diamondop> Relt (\<alpha>\<^sub>1\<^sup>\<circ>)"
 and
   comp   : "(graphF cmp) \<diamondop> \<alpha>\<^sub>2 \<subseteq> Relt \<alpha>\<^sub>2 \<diamondop> abs_cmp"
 and
@@ -180,11 +180,11 @@ lemma DaC_entire :
 "entire c \<Longrightarrow> entire(lfp(DaC_scheme (graphF dcmp) c))"
   apply(simp add: entire_def)
   apply(rule subset_trans, rule reduct)
-  apply(rule_tac H="\<lambda>x. x \<diamondop> x\<inverse>" in lfp_fusion)
+  apply(rule_tac H="\<lambda>x. x \<diamondop> x\<^sup>\<circ>" in lfp_fusion)
   apply(rule monoI, rule DaC_mono, simp+)
   apply(rule allI)
-  apply(subgoal_tac "monotypeF (graphF dcmp) (Relt (x \<diamondop> x\<inverse>)) \<subseteq> 
-                    (monotypeF (graphF dcmp) (Relt (x \<diamondop> x\<inverse>)) \<diamondop> (graphF dcmp)) \<diamondop> (graphF dcmp)\<inverse>")
+  apply(subgoal_tac "monotypeF (graphF dcmp) (Relt (x \<diamondop> x\<^sup>\<circ>)) \<subseteq> 
+                    (monotypeF (graphF dcmp) (Relt (x \<diamondop> x\<^sup>\<circ>)) \<diamondop> (graphF dcmp)) \<diamondop> (graphF dcmp)\<^sup>\<circ>")
    apply(erule subset_trans)
    apply(rule subset_trans)
     apply(rule relcomp_mono)
@@ -212,7 +212,7 @@ lemma DaC_entire :
 
 
 lemma DaC_impl :
-"\<alpha>\<^sub>1\<inverse> \<diamondop> lfp(DaC_scheme (graphF dcmp) (graphF cmp)) \<diamondop> \<alpha>\<^sub>2 \<subseteq> spec"
+"\<alpha>\<^sub>1\<^sup>\<circ> \<diamondop> lfp(DaC_scheme (graphF dcmp) (graphF cmp)) \<diamondop> \<alpha>\<^sub>2 \<subseteq> spec"
   apply(subst O_assoc[THEN sym])
   apply(subst ldiv_univ)
   apply(subst rdiv_univ)
@@ -252,7 +252,7 @@ lemma DaC_impl :
 
 theorem DaC_synthesis :
 "\<exists>\<phi>. lfp(DaC_scheme (graphF dcmp) (graphF cmp)) = graphF \<phi> \<and>
-     \<alpha>\<^sub>1\<inverse> \<diamondop> graphF \<phi> \<diamondop> \<alpha>\<^sub>2 \<subseteq> spec"
+     \<alpha>\<^sub>1\<^sup>\<circ> \<diamondop> graphF \<phi> \<diamondop> \<alpha>\<^sub>2 \<subseteq> spec"
   apply(subgoal_tac "\<exists>\<phi>. lfp(DaC_scheme (graphF dcmp) (graphF cmp)) = graphF \<phi>")
    apply clarify
    apply(rule exI, rule conjI, assumption)
@@ -312,7 +312,7 @@ lemma dac_unq_function :
   
 
 lemma dac_impl :
-"\<alpha>\<^sub>1\<inverse> \<diamondop> (graphF dac) \<diamondop> \<alpha>\<^sub>2 \<subseteq> spec"
+"\<alpha>\<^sub>1\<^sup>\<circ> \<diamondop> (graphF dac) \<diamondop> \<alpha>\<^sub>2 \<subseteq> spec"
   by (simp add: DaC_impl dac_lfp)
 
 

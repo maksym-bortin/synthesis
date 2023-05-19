@@ -26,6 +26,13 @@ type_synonym ('a, 'b) arrow = "('a \<times> 'b) set" ("_ \<rightarrow> _" [50, 5
 abbreviation relcomp'  :: "('a \<times> 'b) set \<Rightarrow> ('b \<times> 'c) set \<Rightarrow> ('a \<times> 'c) set"  (infixr "\<diamondop>" 75)
   where "r \<diamondop> s \<equiv> r O s"
 
+abbreviation converse' :: "('a \<times> 'b) set \<Rightarrow> ('b \<times> 'a) set"  ("(_\<^sup>\<circ>)" [1000] 999)
+  where "r\<^sup>\<circ> \<equiv> r\<inverse>"
+
+
+
+
+
 
 definition ldiv :: "'a \<rightarrow> 'c \<Rightarrow> 'b \<rightarrow> 'c \<Rightarrow> 'a \<rightarrow> 'b" (infixl "ldiv" 55)
   where "s ldiv r = \<Union>{x. x \<diamondop> r \<subseteq> s}"
@@ -104,8 +111,8 @@ lemma graphF_sub :
 
 section "Simple and entire arrows"
 
-definition "simple r = (r\<inverse> \<diamondop> r \<subseteq> Id)"
-definition "entire r = (Id \<subseteq> r \<diamondop> r\<inverse>)"
+definition "simple r = (r\<^sup>\<circ> \<diamondop> r \<subseteq> Id)"
+definition "entire r = (Id \<subseteq> r \<diamondop> r\<^sup>\<circ>)"
 
 lemma mapping :
 "simple r \<Longrightarrow> entire r \<Longrightarrow> \<exists>f. r = graphF f"
