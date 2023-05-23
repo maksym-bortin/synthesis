@@ -60,7 +60,7 @@ pow decomp_spec comp_spec decomp_impl comp_impl
      apply (metis insert_Diff insert_mono subset_Diff_insert subset_insert_iff)
 
   text "decomposition implementation:"
-    apply(clarsimp simp: decomp_spec_def decomp_impl_def graphF_def Relt_def)
+    apply(clarsimp simp: decomp_spec_def decomp_impl_def graph_of_def Relt_def)
     apply(case_tac xs, simp)
      apply(rule_tac b=Empty in relcompI, clarsimp+)
     apply(rename_tac x xs)
@@ -68,7 +68,7 @@ pow decomp_spec comp_spec decomp_impl comp_impl
      apply simp+
 
   text "composition implementation:"
-   apply(clarsimp simp: comp_spec_def comp_impl_def graphF_def Relt_def)
+   apply(clarsimp simp: comp_spec_def comp_impl_def graph_of_def Relt_def)
    apply(rename_tac xxs)
    apply(case_tac xxs, simp)
     apply(rule_tac b=Empty in relcompI, clarsimp+)
@@ -91,7 +91,7 @@ pow decomp_spec comp_spec decomp_impl comp_impl
    apply(erule monoD[OF Relt_mono])
   apply(subst singleton_eq)
   apply(rule monotypeF_univ[THEN iffD1])
-  apply(subst graphF_def, subst graphF_def)
+  apply(subst graph_of_def, subst graph_of_def)
   apply(clarsimp simp: decomp_impl_def)
   apply(rename_tac xs)
   apply(case_tac xs, simp)
@@ -119,7 +119,7 @@ lemma syn_powerset_corr :
   apply(insert powerset.dac_impl)
   apply(drule_tac c="(set xs, {set ys |ys. ys \<in> set(powerset.dac xs)})" in subsetD)
    apply(rule_tac b=xs in relcompI, simp)
-   apply(rule_tac b="powerset.dac xs" in relcompI, simp add: graphF_def)
+   apply(rule_tac b="powerset.dac xs" in relcompI, simp add: graph_of_def)
    apply simp
   apply(clarsimp simp: pow_def)
   by metis

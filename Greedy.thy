@@ -335,7 +335,7 @@ greedy_spec decomp_spec comp_spec decomp_impl comp_impl
      apply(rule prefixed_point_property)
 
   text "decomposition implementation:"
-    apply(clarsimp simp: decomp_spec_def decomp_impl_def graphF_def Relt_def)
+    apply(clarsimp simp: decomp_spec_def decomp_impl_def graph_of_def Relt_def)
     apply(case_tac xs, simp)
      apply(rule_tac b=Empty in relcompI, clarsimp+)
     apply(rename_tac x xs)
@@ -343,7 +343,7 @@ greedy_spec decomp_spec comp_spec decomp_impl comp_impl
      apply simp+
 
   text "composition implementation:"
-   apply(clarsimp simp: comp_spec_def comp_impl_def graphF_def Relt_def)
+   apply(clarsimp simp: comp_spec_def comp_impl_def graph_of_def Relt_def)
    apply(rename_tac xs)
    apply(case_tac xs, simp)
     apply(rule_tac b=Empty in relcompI, clarsimp+)
@@ -372,7 +372,7 @@ greedy_spec decomp_spec comp_spec decomp_impl comp_impl
    apply(erule monoD[OF Relt_mono])
   apply(subst singleton_eq)
   apply(rule monotypeF_univ[THEN iffD1])
-  apply(subst graphF_def, subst graphF_def)
+  apply(subst graph_of_def, subst graph_of_def)
   apply(clarsimp simp: decomp_impl_def)
   apply(rename_tac xs)
   apply(case_tac xs, simp)
@@ -407,7 +407,7 @@ lemma syn_greedy_max_basis :
   apply(insert greedy.dac_impl)
   apply(drule_tac c="(set xs, set(greedy.dac xs))" in subsetD)
   apply(rule_tac b=xs in relcompI, simp)
-  apply(rule_tac b="greedy.dac xs" in relcompI, simp add: graphF_def)
+  apply(rule_tac b="greedy.dac xs" in relcompI, simp add: graph_of_def)
   apply(simp add: syn_greedy_dist)
   apply(simp add: greedy_spec_def)
   done

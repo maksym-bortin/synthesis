@@ -361,6 +361,7 @@ lemma example_eval :
 "scheduling.greedy_tr adm ins [j\<^sub>1, j\<^sub>4, j\<^sub>3, j\<^sub>2] [] = [j\<^sub>4, j\<^sub>1]"
   by(simp add: adm_def j\<^sub>1_def j\<^sub>2_def j\<^sub>3_def j\<^sub>4_def)
 
+
 lemma example_conclusion :
 "finite_matroids.max_weight_basis scheduling.\<L>_img w_job {j\<^sub>1, j\<^sub>4, j\<^sub>3, j\<^sub>2} {j\<^sub>4, j\<^sub>1}"
   apply(subgoal_tac "distinct [j\<^sub>1, j\<^sub>4, j\<^sub>3, j\<^sub>2]")

@@ -76,36 +76,34 @@ lemma ldiv_rdiv_comm :
 
 section "Functions as relations"
 
-definition "graphF f = {(a, f a) |a. a \<in> UNIV}"
+definition "graph_of f = {(a, f a) |a. a \<in> UNIV}"
 definition "funct_of r = (\<lambda>u. THE v. (u, v) \<in> r)" 
 
-lemma graphF_funct_of :
-  "funct_of(graphF f) = f"
-by(simp add: graphF_def funct_of_def)
+lemma graph_of_funct_of :
+"funct_of(graph_of f) = f"
+  by(simp add: graph_of_def funct_of_def)
   
-lemma graphF_inj :
-  "inj graphF"
-  apply(rule injI)
-  apply(drule_tac f=funct_of in arg_cong)
-  by(simp add: graphF_funct_of)
+lemma graph_of_inj :
+"inj graph_of"
+  by (metis graph_of_funct_of injI)
+
+lemma graph_of_id :
+"graph_of id = Id"
+  by(simp add: graph_of_def, blast)
 
 
-lemma graphF_id :
-  "graphF id = Id"
-by(simp add: graphF_def, blast)
+lemma graph_of_comp :
+"graph_of(g \<circ> f) = graph_of f \<diamondop> graph_of g"
+  by(simp add: graph_of_def, blast)
 
-lemma graphF_comp :
-  "graphF(g \<circ> f) = graphF f \<diamondop> graphF g"
-  by(simp add: graphF_def, blast)
-
-lemma graphF_eqD :
-"r = graphF f \<Longrightarrow> (\<forall>x. (x, f x) \<in> r \<and> (\<forall>v. (x, v) \<in> r \<longrightarrow> v = f x))"
-  by(clarsimp simp: graphF_def)
+lemma graph_of_eqD :
+"r = graph_of f \<Longrightarrow> (\<forall>x. (x, f x) \<in> r \<and> (\<forall>v. (x, v) \<in> r \<longrightarrow> v = f x))"
+  by(clarsimp simp: graph_of_def)
 
 
-lemma graphF_sub :
-"graphF f \<subseteq> graphF g \<Longrightarrow> f = g"
-  using graphF_def graphF_eqD by blast
+lemma graph_of_sub :
+"graph_of f \<subseteq> graph_of g \<Longrightarrow> f = g"
+  using graph_of_def graph_of_eqD by blast
 
 
 
@@ -115,9 +113,9 @@ definition "simple r = (r\<^sup>\<circ> \<diamondop> r \<subseteq> Id)"
 definition "entire r = (Id \<subseteq> r \<diamondop> r\<^sup>\<circ>)"
 
 lemma mapping :
-"simple r \<Longrightarrow> entire r \<Longrightarrow> \<exists>f. r = graphF f"
+"simple r \<Longrightarrow> entire r \<Longrightarrow> \<exists>f. r = graph_of f"
   apply(rule_tac x="\<lambda>x. (SOME v. (x, v) \<in> r)" in exI)
-  apply(simp add: simple_def entire_def graphF_def)
+  apply(simp add: simple_def entire_def graph_of_def)
   apply(rule set_eqI, clarsimp)
   apply(rule iffI)
    apply(rule someI2, assumption)

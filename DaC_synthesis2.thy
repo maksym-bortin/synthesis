@@ -66,39 +66,39 @@ lemma Relt_entire :
   by (metis Relt_Id Relt_comp Relt_conv_eq Relt_mono entire_def monoE)
 
 
-lemma Relt_graphF :
-"\<exists>g. Relt(graphF f) = graphF g"
-  apply(subgoal_tac "simple (graphF f)")
-  apply(subgoal_tac "entire (graphF f)")
+lemma Relt_graph_of :
+"\<exists>g. Relt(graph_of f) = graph_of g"
+  apply(subgoal_tac "simple (graph_of f)")
+  apply(subgoal_tac "entire (graph_of f)")
   apply (simp add: Relt_entire Relt_simple mapping)
-  by(simp add: graphF_def simple_def entire_def, fast)+
+  by(simp add: graph_of_def simple_def entire_def, fast)+
 
 
 subsubsection "The induced endofunctor"
 
 definition
-  "ReltF f = funct_of(Relt (graphF f))"
+  "ReltF f = funct_of(Relt (graph_of f))"
 
 lemma ReltF_eqs :
 "ReltF f Empty = Empty"
 "ReltF f (Dcmp x u v) = Dcmp x (f u) (f v)"
-  by(simp add: ReltF_def Relt_def funct_of_def graphF_def)+
+  by(simp add: ReltF_def Relt_def funct_of_def graph_of_def)+
 
 lemma ReltF :
-"Relt(graphF f) = graphF(ReltF f)"
-  by (metis ReltF_def Relt_graphF graphF_funct_of)
+"Relt(graph_of f) = graph_of(ReltF f)"
+  by (metis ReltF_def Relt_graph_of graph_of_funct_of)
 
 
 text "the functor axioms:"
 
 lemma ReltF1 :
 "ReltF id = id"
-  by (metis ReltF_def Relt_Id graphF_funct_of graphF_id)
+  by (metis ReltF_def Relt_Id graph_of_funct_of graph_of_id)
 
 
 lemma ReltF2 :
   "ReltF (g \<circ> f) = ReltF g \<circ> ReltF f"
-  by (metis ReltF Relt_comp graphF_comp graphF_funct_of)
+  by (metis ReltF Relt_comp graph_of_comp graph_of_funct_of)
 
 
 
@@ -128,11 +128,11 @@ locale DaC_synthesis =
 assumes
   DaC : "DaC_scheme abs_dcmp abs_cmp spec \<subseteq> spec"
 and
-  decomp : "\<alpha>\<^sub>1\<^sup>\<circ> \<diamondop> (graphF dcmp) \<subseteq> abs_dcmp \<diamondop> Relt (\<alpha>\<^sub>1\<^sup>\<circ>)"
+  decomp : "\<alpha>\<^sub>1\<^sup>\<circ> \<diamondop> (graph_of dcmp) \<subseteq> abs_dcmp \<diamondop> Relt (\<alpha>\<^sub>1\<^sup>\<circ>)"
 and
-  comp   : "(graphF cmp) \<diamondop> \<alpha>\<^sub>2 \<subseteq> Relt \<alpha>\<^sub>2 \<diamondop> abs_cmp"
+  comp   : "(graph_of cmp) \<diamondop> \<alpha>\<^sub>2 \<subseteq> Relt \<alpha>\<^sub>2 \<diamondop> abs_cmp"
 and
-  reduct : "Id \<subseteq> lfp(\<lambda>x. monotypeF (graphF dcmp) (Relt x))"
+  reduct : "Id \<subseteq> lfp(\<lambda>x. monotypeF (graph_of dcmp) (Relt x))"
 begin
 
 
@@ -171,14 +171,14 @@ lemma DaC_simple :
 
 
 lemma DaC_entire :
-"entire c \<Longrightarrow> entire(lfp(DaC_scheme (graphF dcmp) c))"
+"entire c \<Longrightarrow> entire(lfp(DaC_scheme (graph_of dcmp) c))"
   apply(simp add: entire_def)
   apply(rule subset_trans, rule reduct)
   apply(rule_tac H="\<lambda>x. x \<diamondop> x\<^sup>\<circ>" in lfp_fusion)
   apply(rule monoI, rule DaC_mono, simp+)
   apply(rule allI)
-  apply(subgoal_tac "monotypeF (graphF dcmp) (Relt (x \<diamondop> x\<^sup>\<circ>)) \<subseteq> 
-                    (monotypeF (graphF dcmp) (Relt (x \<diamondop> x\<^sup>\<circ>)) \<diamondop> (graphF dcmp)) \<diamondop> (graphF dcmp)\<^sup>\<circ>")
+  apply(subgoal_tac "monotypeF (graph_of dcmp) (Relt (x \<diamondop> x\<^sup>\<circ>)) \<subseteq> 
+                    (monotypeF (graph_of dcmp) (Relt (x \<diamondop> x\<^sup>\<circ>)) \<diamondop> (graph_of dcmp)) \<diamondop> (graph_of dcmp)\<^sup>\<circ>")
    apply(erule subset_trans)
    apply(rule subset_trans)
     apply(rule relcomp_mono)
@@ -200,13 +200,13 @@ lemma DaC_entire :
   apply(rule subset_trans[rotated 1])
    apply(rule_tac s'=Id in relcomp_mono)
     apply(rule subset_refl)
-   apply(clarsimp simp: graphF_def, fast)
+   apply(clarsimp simp: graph_of_def, fast)
   by simp
 
 
 
 lemma DaC_impl :
-"\<alpha>\<^sub>1\<^sup>\<circ> \<diamondop> lfp(DaC_scheme (graphF dcmp) (graphF cmp)) \<diamondop> \<alpha>\<^sub>2 \<subseteq> spec"
+"\<alpha>\<^sub>1\<^sup>\<circ> \<diamondop> lfp(DaC_scheme (graph_of dcmp) (graph_of cmp)) \<diamondop> \<alpha>\<^sub>2 \<subseteq> spec"
   apply(subst O_assoc[THEN sym])
   apply(subst ldiv_univ)
   apply(subst rdiv_univ)
@@ -245,65 +245,65 @@ lemma DaC_impl :
 
 
 theorem DaC_synthesis :
-"\<exists>\<phi>. lfp(DaC_scheme (graphF dcmp) (graphF cmp)) = graphF \<phi> \<and>
-     \<alpha>\<^sub>1\<^sup>\<circ> \<diamondop> graphF \<phi> \<diamondop> \<alpha>\<^sub>2 \<subseteq> spec"
-  apply(subgoal_tac "\<exists>\<phi>. lfp(DaC_scheme (graphF dcmp) (graphF cmp)) = graphF \<phi>")
+"\<exists>\<phi>. lfp(DaC_scheme (graph_of dcmp) (graph_of cmp)) = graph_of \<phi> \<and>
+     \<alpha>\<^sub>1\<^sup>\<circ> \<diamondop> graph_of \<phi> \<diamondop> \<alpha>\<^sub>2 \<subseteq> spec"
+  apply(subgoal_tac "\<exists>\<phi>. lfp(DaC_scheme (graph_of dcmp) (graph_of cmp)) = graph_of \<phi>")
    apply clarify
    apply(rule exI, rule conjI, assumption)
    apply(erule subst)
    apply(rule DaC_impl)
   apply(rule mapping)
    apply(rule DaC_simple)
-    apply(clarsimp simp: simple_def graphF_def)
-   apply(clarsimp simp: simple_def graphF_def)
+    apply(clarsimp simp: simple_def graph_of_def)
+   apply(clarsimp simp: simple_def graph_of_def)
   apply(rule DaC_entire)
-  apply(clarsimp simp: entire_def graphF_def)
+  apply(clarsimp simp: entire_def graph_of_def)
   by fast
 
 
-definition "dac = (THE \<phi>. lfp(DaC_scheme (graphF dcmp) (graphF cmp)) = graphF \<phi>)"
+definition "dac = (THE \<phi>. lfp(DaC_scheme (graph_of dcmp) (graph_of cmp)) = graph_of \<phi>)"
 
 
 lemma dac_unq :
-"lfp (DaC_scheme (graphF dcmp) (graphF cmp)) = graphF f \<Longrightarrow> f = dac"
-  by (smt (verit, ccfv_threshold) dac_def graphF_funct_of the_equality)
+"lfp (DaC_scheme (graph_of dcmp) (graph_of cmp)) = graph_of f \<Longrightarrow> f = dac"
+  by (smt (verit, ccfv_threshold) dac_def graph_of_funct_of the_equality)
 
 
 lemma dac_lfp :
-"graphF dac = lfp(DaC_scheme (graphF dcmp) (graphF cmp))"
+"graph_of dac = lfp(DaC_scheme (graph_of dcmp) (graph_of cmp))"
   using DaC_synthesis dac_unq by fastforce
 
 
 lemma dac_unfold' :
-"graphF dac = (graphF dcmp) \<diamondop> Relt(graphF dac) \<diamondop> (graphF cmp)"
+"graph_of dac = (graph_of dcmp) \<diamondop> Relt(graph_of dac) \<diamondop> (graph_of cmp)"
 proof -
-  have "graphF dac = lfp (DaC_scheme (graphF dcmp) (graphF cmp))" (is "?l = ?r")
+  have "graph_of dac = lfp (DaC_scheme (graph_of dcmp) (graph_of cmp))" (is "?l = ?r")
     by (simp add: dac_lfp)
-  also have "... = DaC_scheme (graphF dcmp) (graphF cmp) ?r"
+  also have "... = DaC_scheme (graph_of dcmp) (graph_of cmp) ?r"
     by(rule lfp_unfold, rule monoI, rule DaC_mono, simp+)
-  also have "... = DaC_scheme (graphF dcmp) (graphF cmp) ?l"
+  also have "... = DaC_scheme (graph_of dcmp) (graph_of cmp) ?l"
     by (simp add: dac_lfp)
   finally show ?thesis by(simp add: DaC_scheme_def)
 qed
 
 
 lemma dac_unq_function' :
-"(graphF dcmp) \<diamondop> Relt(graphF f) \<diamondop> (graphF cmp) \<subseteq> graphF f \<Longrightarrow> dac = f"
-  by (simp add: DaC_scheme_def dac_lfp graphF_sub lfp_lowerbound)
+"(graph_of dcmp) \<diamondop> Relt(graph_of f) \<diamondop> (graph_of cmp) \<subseteq> graph_of f \<Longrightarrow> dac = f"
+  by (simp add: DaC_scheme_def dac_lfp graph_of_sub lfp_lowerbound)
 
 
 lemma dac_unfold :
 "dac = cmp \<circ> ReltF dac \<circ> dcmp"
-  by (metis ReltF dac_lfp dac_unfold' dac_unq graphF_comp)
+  by (metis ReltF dac_lfp dac_unfold' dac_unq graph_of_comp)
 
 
 lemma dac_unq_function :
 "f = cmp \<circ> ReltF f \<circ> dcmp \<Longrightarrow> f = dac"
-  by (metis ReltF dac_unq_function' graphF_comp subset_refl)
+  by (metis ReltF dac_unq_function' graph_of_comp subset_refl)
   
 
 lemma dac_impl :
-"\<alpha>\<^sub>1\<^sup>\<circ> \<diamondop> (graphF dac) \<diamondop> \<alpha>\<^sub>2 \<subseteq> spec"
+"\<alpha>\<^sub>1\<^sup>\<circ> \<diamondop> (graph_of dac) \<diamondop> \<alpha>\<^sub>2 \<subseteq> spec"
   by (simp add: DaC_impl dac_lfp)
 
 

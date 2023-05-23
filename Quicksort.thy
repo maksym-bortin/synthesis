@@ -47,7 +47,7 @@ interpretation quicksort: DaC_synthesis
      apply(clarsimp simp: Relt_def DaC_scheme_def)
      apply(erule disjE, clarsimp+)
      using Sorted_append apply fastforce
-       apply(clarsimp simp: graphF_def Relt_def)
+       apply(clarsimp simp: graph_of_def Relt_def)
        apply(case_tac xs, fastforce)
        apply clarsimp
        apply(rename_tac x xs)
@@ -56,7 +56,7 @@ interpretation quicksort: DaC_synthesis
         apply(rule set_eqI)
      using linorder_neq_iff apply fastforce
        apply clarsimp
-      apply(clarsimp simp: graphF_def Relt_def)
+      apply(clarsimp simp: graph_of_def Relt_def)
       apply(rename_tac x)
       apply(case_tac x, fastforce)
       apply clarsimp
@@ -71,7 +71,7 @@ interpretation quicksort: DaC_synthesis
       apply(erule monoD[OF Relt_mono])
      apply(subst singleton_eq)
      apply(rule monotypeF_univ[THEN iffD1])
-     apply(subst graphF_def, subst graphF_def)
+     apply(subst graph_of_def, subst graph_of_def)
      apply clarsimp
      apply(rename_tac xs)
      apply(case_tac xs, simp)
@@ -101,7 +101,7 @@ lemma quicksort_impl :
   apply(insert quicksort.dac_impl)
   apply(drule_tac c="(xs, quicksort.dac xs)" in subsetD)
    apply(rule_tac b=xs in relcompI, simp)
-   apply(rule_tac b="quicksort.dac xs" in relcompI, simp add: graphF_def)
+   apply(rule_tac b="quicksort.dac xs" in relcompI, simp add: graph_of_def)
    apply simp
   by blast
 
