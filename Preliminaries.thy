@@ -17,22 +17,20 @@ imports Main
 begin
 
 
-section "Arrow divisions"
 
 text "Arrows in this setting are relations between  
       sets of values classified by the source and target types."
 type_synonym ('a, 'b) arrow = "('a \<times> 'b) set" ("_ \<rightarrow> _" [50, 50] 51)
 
-abbreviation relcomp'  :: "('a \<times> 'b) set \<Rightarrow> ('b \<times> 'c) set \<Rightarrow> ('a \<times> 'c) set"  (infixr "\<diamondop>" 75)
+abbreviation relcomp'  :: "'a \<rightarrow> 'b \<Rightarrow> 'b \<rightarrow> 'c \<Rightarrow> 'a \<rightarrow> 'c"  (infixr "\<diamondop>" 75)
   where "r \<diamondop> s \<equiv> r O s"
 
-abbreviation converse' :: "('a \<times> 'b) set \<Rightarrow> ('b \<times> 'a) set"  ("(_\<^sup>\<circ>)" [1000] 999)
+abbreviation converse' :: "'a \<rightarrow> 'b \<Rightarrow> 'b \<rightarrow> 'a"  ("(_\<^sup>\<circ>)" [1000] 999)
   where "r\<^sup>\<circ> \<equiv> r\<inverse>"
 
 
 
-
-
+section "Arrow divisions"
 
 definition ldiv :: "'a \<rightarrow> 'c \<Rightarrow> 'b \<rightarrow> 'c \<Rightarrow> 'a \<rightarrow> 'b" (infixl "ldiv" 55)
   where "s ldiv r = \<Union>{x. x \<diamondop> r \<subseteq> s}"
@@ -193,6 +191,13 @@ lemma Sorted_nth :
 
 
 section "A few more auxiliaries"
+
+definition monotype :: "'a set \<Rightarrow> 'a \<rightarrow> 'a"
+  where "monotype A = {(x,x) |x. x\<in>A}"
+
+lemma monotype_eq :
+"((a, b) \<in> monotype A) = (a = b \<and> a \<in> A)"
+  by(simp add: monotype_def, fast)
 
 lemma singleton_eq :
 "(a \<in> A) = ({a} \<subseteq> A)"
