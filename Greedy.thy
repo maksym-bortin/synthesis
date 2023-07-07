@@ -248,8 +248,10 @@ text "In addition to the language-struct locale we assume that the ground set el
       matroids locale in this context."
 interpretation fm : finite_matroids \<L>_img
   by(unfold_locales, rule \<L>_img_independence)
+
+definition "max_weight_basis = fm.max_weight_basis"
  
-definition "greedy_spec = {(G, X) |G X. fm.max_weight_basis w G X}"
+definition "greedy_spec = {(G, X) |G X. max_weight_basis w G X}"
 
 definition "decomp_spec = {({}, Empty)} \<union> {(G, Dcmp x (G - {x})) |G x. x \<in> G \<and> (\<forall>z\<in>G. w x \<le> w z)}"
 
@@ -274,11 +276,11 @@ theorem prefixed_point_property :
   apply(rename_tac G a b c)
   apply(case_tac "G = {}")
    apply(clarsimp simp: \<L>_img_independence decomp_spec_def comp_spec_def greedy_spec_def Relt_def 
-           fm.max_weight_basis_def fm.basis_def)
+         max_weight_basis_def fm.max_weight_basis_def fm.basis_def)
    apply(rule Independent_D1, rule \<L>_img_independence)
   apply(clarsimp simp: decomp_spec_def comp_spec_def Relt_def)
   apply(rename_tac a X)
-  apply(clarsimp simp: greedy_spec_def fm.max_weight_basis_def)
+  apply(clarsimp simp: greedy_spec_def max_weight_basis_def fm.max_weight_basis_def)
   apply(frule fm.basisD2)
   apply(erule disjE, clarsimp)
    apply(frule_tac x=a in fm.A1_1, simp+)
@@ -383,19 +385,22 @@ greedy_spec decomp_spec comp_spec decomp_impl comp_impl
   apply(subst Relt_def, simp)
   done
 
+text "Renaming the synthesised function explicitly:"
+definition "syn_greedy = greedy.dac"
+
 text "Deriving the recursive equations for the synthesised function:"
 lemma syn_greedy_eqs[simp] :
-"greedy.dac [] = []"
-"greedy.dac (x#xs) = (if x # greedy.dac xs \<in> \<L> then x # greedy.dac xs else greedy.dac xs)"
-  by(subst greedy.dac_unfold, simp add: decomp_impl_def comp_impl_def ReltF_eqs)+
+"syn_greedy [] = []"
+"syn_greedy (x#xs) = (if x # syn_greedy xs \<in> \<L> then x # syn_greedy xs else syn_greedy xs)"
+unfolding syn_greedy_def by(subst greedy.dac_unfold, simp add: decomp_impl_def comp_impl_def ReltF_eqs)+
 
 lemma syn_greedy_sub[simp] :
-"set(greedy.dac xs) \<subseteq> set xs"
+"set(syn_greedy xs) \<subseteq> set xs"
   by(induct xs, simp+, fast)
 
 
 lemma syn_greedy_dist :
-"distinct xs \<Longrightarrow> distinct (greedy.dac xs)"
+"distinct xs \<Longrightarrow> distinct (syn_greedy xs)"
   apply(induct xs, clarsimp+)
   apply(drule subsetD[OF syn_greedy_sub])
   by simp
@@ -403,95 +408,95 @@ lemma syn_greedy_dist :
 
 lemma syn_greedy_max_basis :
 "distinct xs \<Longrightarrow> Sorted w xs \<Longrightarrow> 
- fm.max_weight_basis w (set xs) (set(greedy.dac xs))"
+ max_weight_basis w (set xs) (set(syn_greedy xs))"
   apply(insert greedy.dac_impl)
-  apply(drule_tac c="(set xs, set(greedy.dac xs))" in subsetD)
+  apply(drule_tac c="(set xs, set(syn_greedy xs))" in subsetD)
   apply(rule_tac b=xs in relcompI, simp)
-  apply(rule_tac b="greedy.dac xs" in relcompI, simp add: graph_of_def)
+  apply(rule_tac b="syn_greedy xs" in relcompI, simp add: graph_of_def syn_greedy_def)
   apply(simp add: syn_greedy_dist)
   apply(simp add: greedy_spec_def)
   done
 
+end (* the greedy tactic locale *)
+
+
+
+locale enhanced_greedy = greedy_tactic +
+  fixes ins :: "'a \<Rightarrow> 'a list \<Rightarrow> 'a list"
+    and \<L>' :: "'a list set"
+  assumes set_ins : "set(ins x xs) = set(x#xs)"
+     and  transl  : "distinct xs \<Longrightarrow> (foldr ins xs [] \<in> \<L>') = (xs \<in> \<L>)"
+begin
 
 subsection "First transformation step"
 
 fun greedy where
-  "greedy adm ins [] = []"
-| "greedy adm ins (x#xs) = 
-(let g = greedy adm ins xs in
- let xs' = ins x g in
-  if xs' \<in> adm then xs' else g)"
+  "greedy [] = []"
+| "greedy (x#xs) = (let g = greedy xs in
+                     let xs' = ins x g in
+                        if xs' \<in> \<L>' then xs' else g)"
 
-text "Connection to the synthesised function @{term greedy.dac}: "
+
+text "Connection to the synthesised function @{term syn_greedy}: "
 lemma greedy_eq_syn :
-"\<forall>xs. distinct xs \<longrightarrow> (foldr ins xs [] \<in> adm) = (xs \<in> \<L>) \<Longrightarrow>
- distinct xs \<Longrightarrow>
-  greedy adm ins xs = foldr ins (greedy.dac xs) []"
+"distinct xs \<Longrightarrow> greedy xs = foldr ins (syn_greedy xs) []"
   apply(induct xs, simp+)
   apply clarify
   apply(frule syn_greedy_dist)
-  apply(subgoal_tac "distinct (a#greedy.dac xs)")
+  apply(subgoal_tac "distinct (a#syn_greedy xs)")
+  apply(drule_tac xs="a#syn_greedy xs" in transl)
   apply(simp add: Let_def)
-  apply(drule_tac x="a#greedy.dac xs" in spec)
-  apply fastforce
   apply clarsimp
   apply(drule subsetD[OF syn_greedy_sub])
   by clarify
   
 
 lemma ins_gen :
-"\<forall>x xs. set(ins x xs) = set(x#xs)\<Longrightarrow> set(foldr ins xs []) = set xs"
-  by(induct xs, simp_all)
+"set(foldr ins xs []) = set xs"
+  by(induct xs, simp_all add: set_ins)
 
 
 lemma transformation1_correctness :
-"\<forall>x xs. set(ins x xs) = set(x#xs)\<Longrightarrow>
- \<forall>xs. distinct xs \<longrightarrow> (foldr ins xs [] \<in> adm) = (xs \<in> \<L>) \<Longrightarrow>
- distinct xs \<Longrightarrow>
-  set(greedy adm ins xs) = set(greedy.dac xs)"
-  apply(drule greedy_eq_syn, assumption)
+"distinct xs \<Longrightarrow> set(greedy xs) = set(syn_greedy xs)"
+  apply(drule greedy_eq_syn)
   apply(erule ssubst)
-  apply(erule ins_gen)
-  done
-
+  by(simp add: ins_gen)
 
 
 subsection "Second transformation (tail-recursion)"
 
 
 fun greedy_tr 
-  where "greedy_tr adm ins [] rs = rs" |
-        "greedy_tr adm ins (x#xs) rs = (let v = ins x rs in
-                                         if v \<in> adm then greedy_tr adm ins xs v 
-                                         else greedy_tr adm ins xs rs)"
+  where "greedy_tr [] rs = rs" |
+        "greedy_tr (x#xs) rs = (let v = ins x rs in
+                                 if v \<in> \<L>' then greedy_tr xs v 
+                                         else greedy_tr xs rs)"
 
 lemma greedy_tr_app[rule_format] :
-  "\<forall>rs. greedy_tr adm ins (xs@xs') rs = greedy_tr adm ins xs' (greedy_tr adm ins xs rs)"
+"\<forall>rs. greedy_tr (xs@xs') rs = greedy_tr xs' (greedy_tr xs rs)"
   by(induct_tac xs, simp_all add: Let_def)
   
-text "Connection to @{term greedy} :"  
+text "Connection to the function @{term greedy} :"  
 lemma greedy_greedy_tr :
-  "\<forall>rs. greedy adm ins (xs @ rs) = greedy_tr adm ins (rev xs) (greedy adm ins rs)"
+"\<forall>rs. greedy (xs @ rs) = greedy_tr (rev xs) (greedy rs)"
   apply(induct_tac xs, clarsimp+)
   apply(subst greedy_tr_app)
   by(simp add: Let_def)
 
 
 corollary transformation2_correctness :
-  "greedy adm ins (rev xs) = greedy_tr adm ins xs []"
+  "greedy (rev xs) = greedy_tr xs []"
   apply(subst greedy_greedy_tr[rule_format, where rs="[]", simplified])
   by simp
 
 
 
-text "Summarising the main result of the greedy tactic: "
+text "Summarising the main result of the greedy tactic (synthesis + transformations): "
 corollary greedy_tr_max_basis :
  "distinct xs \<Longrightarrow> Sorted (neg w) xs \<Longrightarrow> 
-  \<forall>x xs. set(ins x xs) = set(x#xs) \<Longrightarrow>
-  \<forall>xs. distinct xs \<longrightarrow> (foldr ins xs [] \<in> adm) = (xs \<in> \<L>) \<Longrightarrow>
-  fm.max_weight_basis w (set xs) (set(greedy_tr adm ins xs []))"
+  max_weight_basis w (set xs) (set(greedy_tr xs []))"
   apply(subst transformation2_correctness[THEN sym])
-  apply(subst transformation1_correctness, assumption+, simp)
+  apply(subst transformation1_correctness, simp)
   apply(subst set_rev[THEN sym])
   apply(rule syn_greedy_max_basis)
   apply simp
@@ -500,7 +505,7 @@ corollary greedy_tr_max_basis :
   done
 
 
-end (* the greedy tactic locale *)
+end (* the enhanced greedy locale *)
 
 
 

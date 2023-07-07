@@ -327,43 +327,49 @@ qed
 qed
 
 
-
-interpretation scheduling : greedy_tactic \<L>_job w_job
+text "Now we can apply the tactic of @{locale enhanced_greedy} :"
+interpretation scheduling : enhanced_greedy \<L>_job w_job ins adm
   apply unfold_locales
    apply(simp add: \<L>_job_def adm_def)
    apply(erule adm')
      apply(rule ins_sorted)
-    apply simp
-   apply(erule dist_ins_fold)
-  by(rule job_Independent)
-
-thm scheduling.greedy_tr_max_basis
-
-theorem opt_scheduling :
- "distinct xs \<Longrightarrow> Sorted (neg w_job) xs \<Longrightarrow> 
-  finite_matroids.max_weight_basis scheduling.\<L>_img w_job (set xs) (set(scheduling.greedy_tr adm ins xs []))"
-  apply(erule scheduling.greedy_tr_max_basis, assumption)
-  apply simp
-  apply(simp add: adm_def \<L>_job_def)
+      apply simp
+     apply(erule dist_ins_fold)
+    apply(rule job_Independent)
+   apply simp
+  apply(simp add: \<L>_job_def)
   done
 
-lemma fm[simp]: "finite_matroids scheduling.\<L>_img" by(unfold_locales, rule job_Independent)
+
+text "The main result for the obtained implementation @{term scheduling.greedy_tr} is:"
+lemmas opt_scheduling = scheduling.greedy_tr_max_basis
+
 
 
 section "The example"
+
+text "Very useful for working with the current instance of @{locale finite_matroids}" 
+lemma fm[simp]: "finite_matroids scheduling.\<L>_img" by(unfold_locales, rule job_Independent)
+
+
 
 definition "j\<^sub>1 = \<lparr> val = 50, date = 2 \<rparr>"
 definition "j\<^sub>2 = \<lparr> val = 10, date = 1 \<rparr>"
 definition "j\<^sub>3 = \<lparr> val = 15, date = 2 \<rparr>"
 definition "j\<^sub>4 = \<lparr> val = 30, date = 1 \<rparr>"
 
+
 lemma example_eval : 
-"scheduling.greedy_tr adm ins [j\<^sub>1, j\<^sub>4, j\<^sub>3, j\<^sub>2] [] = [j\<^sub>4, j\<^sub>1]"
-  by(simp add: adm_def j\<^sub>1_def j\<^sub>2_def j\<^sub>3_def j\<^sub>4_def)
+"scheduling.greedy_tr [j\<^sub>1, j\<^sub>4, j\<^sub>3, j\<^sub>2] [] = [j\<^sub>4, j\<^sub>1]"
+  apply(simp add: j\<^sub>1_def j\<^sub>2_def j\<^sub>3_def j\<^sub>4_def)
+  apply(simp add: Let_def)
+  apply(simp add: adm_def)
+  done
+
 
 
 lemma example_conclusion :
-"finite_matroids.max_weight_basis scheduling.\<L>_img w_job {j\<^sub>1, j\<^sub>4, j\<^sub>3, j\<^sub>2} {j\<^sub>4, j\<^sub>1}"
+"scheduling.max_weight_basis w_job {j\<^sub>1, j\<^sub>4, j\<^sub>3, j\<^sub>2} {j\<^sub>4, j\<^sub>1}"
   apply(subgoal_tac "distinct [j\<^sub>1, j\<^sub>4, j\<^sub>3, j\<^sub>2]")
    apply(drule opt_scheduling)
     apply(simp add: j\<^sub>1_def j\<^sub>2_def j\<^sub>3_def j\<^sub>4_def neg_def w_job_def)
@@ -379,21 +385,23 @@ lemma
 "distinct xs \<Longrightarrow> set xs \<subseteq> {j\<^sub>1, j\<^sub>4, j\<^sub>3, j\<^sub>2} \<Longrightarrow> xs \<in> \<L>_job \<Longrightarrow>
  length xs \<le> 2 \<and> weight w_job (set xs) \<le> 80"
   apply(insert example_conclusion)
+  apply(clarsimp simp: scheduling.max_weight_basis_def)
   apply(clarsimp simp: finite_matroids.max_weight_basis_def)
   apply(rule conjI)
-   apply (metis One_nat_def Suc_1 card.empty card.insert distinct_card finite_insert finite_matroids.basis_def fm insert_absorb le_SucI scheduling.\<L>_img_eq)
+   apply (metis One_nat_def Suc_1 card.empty card.insert distinct_card finite.emptyI finite.insertI finite_matroids.basis_def fm insert_absorb plus_1_eq_Suc scheduling.\<L>_img_eq trans_le_add2)
   apply(subgoal_tac "set xs \<in> scheduling.\<L>_img")
    apply(drule finite_matroids.basis_ext[OF fm], assumption, simp)
    apply clarify
    apply(drule_tac x=A' in spec, simp)
    apply(rule order_trans, erule_tac T=A' in weight_mono)
      apply(drule finite_matroids.basisD2[OF fm])+
-     apply(erule finite_subset, simp)
+     apply (simp add: finite_subset)
     apply(simp add: w_job_def)
    apply(erule order_trans)
    apply(simp (no_asm) add: weight_def w_job_def j\<^sub>1_def j\<^sub>4_def)
   apply(subst scheduling.\<L>_img_def, fast)
   done
+
 
 
 end
