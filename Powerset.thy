@@ -50,7 +50,7 @@ definition comp_impl :: "('a, 'a list list) Relt \<Rightarrow> 'a list list"
 text "Next we apply the divide-and-conquer synthesis rule: " 
 interpretation powerset: DaC_synthesis 
 "{(xs, set xs) |xs. distinct xs}"                 (* \<alpha>\<^sub>1 *)
-"{(xxs, {set xs |xs. xs \<in> set xxs}) |xxs. True}"                               (* \<alpha>\<^sub>2 *)
+"{(xxs, {set xs |xs. xs \<in> set xxs}) |xxs. True}"  (* \<alpha>\<^sub>2 *)
 pow decomp_spec comp_spec decomp_impl comp_impl
   apply(unfold_locales)
 
