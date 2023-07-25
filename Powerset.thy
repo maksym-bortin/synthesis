@@ -22,7 +22,7 @@ text "The following theory contains an introductory example application of the
       list representation for the power set of a given finite set." 
 
 text "Note that the explicit typing merely caters better readability and 
-      may be omitted as well." 
+      would be inferred by the type system if omitted." 
 definition pow :: "'a set \<rightarrow> 'a set set" 
   where "pow = {(S, P) |S P. \<forall>X. (X \<in> P) = (X \<subseteq> S)}"
 

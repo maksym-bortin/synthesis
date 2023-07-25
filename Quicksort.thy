@@ -16,6 +16,9 @@ theory Quicksort
 imports DaC_synthesis2
 begin
 
+
+section "Deriving Quicksort"
+
 text "To underline that the basic principles remain the same,
       the divide-and-conquer tactic will be applied to derive
       the well-known quicksort algorithm."

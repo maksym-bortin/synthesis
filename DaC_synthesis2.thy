@@ -16,6 +16,8 @@ theory DaC_synthesis2
   imports Preliminaries
 begin
 
+section "The divide-and-conquer tactic for another relator" 
+
 text "To illustrate how the design tactic may work also without support for
       type constructor classes, this theory sets up the same synthesis rule 
       but for another relator instance which enables two recursive calls of
@@ -101,8 +103,6 @@ lemma ReltF2 :
   by (metis ReltF Relt_comp graph_of_comp graph_of_funct_of)
 
 
-
-section "The divide-and-conquer synthesis for the above relator" 
 
 text "Note that we actually just copy-and-paste the respective section
       from the theory DaC-synthesis.thy"

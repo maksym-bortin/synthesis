@@ -22,16 +22,18 @@ section "Modelling a particular relator"
 
 
 text "Endorelators are in general modelled by means of 
-       -- an algebraic data type and
-       -- a function that lifts each relation to the respective relation 
-          between the images of the source and the target.
-      The extra parameter 'u below allows us to abstract over the type of 
-      the underlying values and corresponds to the set E in the publication."
-        
+       -- an algebraic data type: "
 datatype ('u, 'a) Relt = Empty | Dcmp 'u 'a 
 
-definition Relt :: "'a \<rightarrow> 'b \<Rightarrow> ('u, 'a) Relt \<rightarrow> ('u, 'b) Relt"
-  where  "Relt r = {(Empty, Empty)} \<union> {(Dcmp x A, Dcmp x B) |x A B. (A, B) \<in> r}"
+text " and 
+       -- a function that lifts each relation to the respective relation 
+          between the images of the source and the target: "
+definition Relt :: "'a \<rightarrow> 'b \<Rightarrow> ('u, 'a) Relt \<rightarrow> ('u, 'b) Relt" where  
+"Relt r = {(Empty, Empty)} \<union> {(Dcmp x A, Dcmp x B) |x A B. (A, B) \<in> r}"
+
+text "The extra type parameter 'u allows us to abstract over the type of 
+      the underlying values and corresponds to the set E in the publication."
+
 
 subsection "The relator axioms"
 
@@ -108,7 +110,7 @@ lemma ReltF2 :
 
 
 
-section "The divide-and-conquer synthesis for the above relator" 
+section "The divide-and-conquer tactic for the above relator" 
 
 definition
 "DaC_scheme decompose compose = (\<lambda>r. decompose \<diamondop> Relt r \<diamondop> compose)"

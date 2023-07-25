@@ -17,6 +17,7 @@ theory Scheduling
   imports Greedy 
 begin
 
+section "Optimal job scheduling"
 
 record job =
  val  :: nat
@@ -155,7 +156,7 @@ lemma dist_ins_fold :
 
 
 
-section "Applying the greedy tactic"
+subsection "Applying the greedy tactic"
 
 definition "w_job = int \<circ> val"
 definition "\<L>_job = {xs. foldr ins xs [] \<in> adm}"
@@ -346,7 +347,7 @@ lemmas opt_scheduling = scheduling.greedy_tr_max_basis
 
 
 
-section "The example"
+subsection "The example"
 
 text "Very useful for working with the current instance of @{locale finite_matroids}" 
 lemma fm[simp]: "finite_matroids scheduling.\<L>_img" by(unfold_locales, rule job_Independent)

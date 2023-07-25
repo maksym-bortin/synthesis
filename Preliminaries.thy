@@ -16,7 +16,7 @@ theory Preliminaries
 imports Main
 begin
 
-
+section "Preliminaries"
 
 text "Arrows in this setting are relations between  
       sets of values classified by the source and target types."
@@ -30,7 +30,7 @@ abbreviation converse' :: "'a \<rightarrow> 'b \<Rightarrow> 'b \<rightarrow> 'a
 
 
 
-section "Arrow divisions"
+subsection "Arrow divisions"
 
 definition ldiv :: "'a \<rightarrow> 'c \<Rightarrow> 'b \<rightarrow> 'c \<Rightarrow> 'a \<rightarrow> 'b" (infixl "ldiv" 55)
   where "s ldiv r = \<Union>{x. x \<diamondop> r \<subseteq> s}"
@@ -72,7 +72,7 @@ lemma ldiv_rdiv_comm :
   done
 
 
-section "Functions as relations"
+subsection "Functions as relations"
 
 definition "graph_of f = {(a, f a) |a. a \<in> UNIV}"
 definition "funct_of r = (\<lambda>u. THE v. (u, v) \<in> r)" 
@@ -105,7 +105,7 @@ lemma graph_of_sub :
 
 
 
-section "Simple and entire arrows"
+subsection "Simple and entire arrows"
 
 definition "simple r = (r\<^sup>\<circ> \<diamondop> r \<subseteq> Id)"
 definition "entire r = (Id \<subseteq> r \<diamondop> r\<^sup>\<circ>)"
@@ -126,7 +126,7 @@ lemma mapping :
 
 
 
-section "Monotype factor"
+subsection "Monotype factor"
 
 definition "monotypeF r s = (r \<diamondop> s) ldiv r"
 
@@ -145,7 +145,7 @@ lemma monotypeF1 :
 
 
 
-section "A least fixed point fusion property"
+subsection "A least fixed point fusion property"
 
 lemma lfp_fusionG :
 "\<forall>x. (F \<circ> H) x \<subseteq> (H \<circ> G) x \<Longrightarrow> G f = f \<Longrightarrow> lfp F \<subseteq> H f"
@@ -157,7 +157,7 @@ lemma lfp_fusion :
   by (metis lfp_fusionG lfp_unfold)
 
 
-section "Sorted lists"
+subsection "Sorted lists"
 
 fun Sorted :: "('a \<Rightarrow> 'b :: linorder) \<Rightarrow> 'a list \<Rightarrow> bool"
 where "Sorted f [] = True" |
@@ -190,7 +190,7 @@ lemma Sorted_nth :
   done
 
 
-section "A few more auxiliaries"
+subsection "A few more auxiliaries"
 
 definition monotype :: "'a set \<Rightarrow> 'a \<rightarrow> 'a"
   where "monotype A = {(x,x) |x. x\<in>A}"

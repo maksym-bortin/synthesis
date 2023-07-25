@@ -47,7 +47,7 @@ lemma Independent_D3 :
 section "Weights"
 
 text "The weight of a set of elements: for simplicity's sake we assume that
-      integers will be attached to the elements as a weight."
+      integers (not reals) will be attached to the elements as a weight."
 definition "weight (w :: 'a \<Rightarrow> int) A = (\<Sum>x\<in>A. w x)" 
 definition "neg (w :: 'a \<Rightarrow> int) = (\<lambda>x. - w x)"
 
@@ -420,6 +420,8 @@ lemma syn_greedy_max_basis :
 end (* the greedy tactic locale *)
 
 
+
+section "Two program transformation steps"
 
 locale enhanced_greedy = greedy_tactic +
   fixes ins :: "'a \<Rightarrow> 'a list \<Rightarrow> 'a list"
