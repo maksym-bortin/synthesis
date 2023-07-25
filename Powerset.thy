@@ -47,7 +47,7 @@ definition comp_impl :: "('a, 'a list list) Relt \<Rightarrow> 'a list list"
 
 
 
-text "Next we apply the divide-and-conquer synthesis rule: " 
+text "Next we apply the divide-and-conquer tactic: " 
 interpretation powerset: DaC_synthesis 
 "{(xs, set xs) |xs. distinct xs}"                 (* \<alpha>\<^sub>1 *)
 "{(xxs, {set xs |xs. xs \<in> set xxs}) |xxs. True}"  (* \<alpha>\<^sub>2 *)
@@ -126,7 +126,7 @@ lemma syn_powerset_corr :
 
 
 
-text "The purpose of the restriction of inputs to distinct lists is
+text "Further effects of the restriction of inputs to distinct lists are
        (a) no more list representations will be generated than needed:"
 lemma syn_powerset_length :
 "distinct xs \<Longrightarrow> length(powerset.dac xs) = 2^(length xs)"
@@ -141,7 +141,8 @@ lemma syn_powerset_distinct :
 
 
 
-text "Finally we can replace the synthesised function by the tail-recursive function:" 
+text "For computation of power set representations the synthesised function 
+      can also be replaced by the tail-recursive version:" 
 fun pow_tr where
 "pow_tr [] rs = rs" |
 "pow_tr (x#xs) rs = pow_tr xs (rs @ map (\<lambda>xs. x#xs) rs)"
@@ -175,5 +176,25 @@ lemma pow_tr_length :
 lemma pow_tr_distinct :
 "distinct xs \<Longrightarrow> \<forall>ys\<in>set(pow_tr xs [[]]). distinct ys"
   by(subst pow_tr, rule syn_powerset_distinct, simp)
+
+
+text "We can ultimately lift the input restriction to distinct lists as follows
+      (the function @{term remdups} removes all duplicates):"
+definition "powerset_repr xs = pow_tr (remdups xs) [[]]"
+
+lemma powerset_repr_corr :
+"(X \<subseteq> set xs) = (\<exists>ys \<in> set(powerset_repr xs). set ys = X)"
+  by(unfold powerset_repr_def, subst pow_tr_corr[THEN sym], simp+)
+
+lemma powerset_repr_length :
+"length(powerset_repr xs) = 2^(length (remdups xs))"
+  by(unfold powerset_repr_def, rule pow_tr_length, simp)
+
+lemma powerset_repr_distinct :
+"ys \<in> set(powerset_repr xs) \<Longrightarrow> distinct ys"
+  by(unfold powerset_repr_def, erule pow_tr_distinct[rule_format, rotated 1], simp)
+
+text "so for instance: "
+value "powerset_repr [(1::nat), 2, 3]"
 
 end
