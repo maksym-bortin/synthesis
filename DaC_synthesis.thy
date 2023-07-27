@@ -121,6 +121,9 @@ lemma DaC_mono :
   apply(simp add: DaC_scheme_def, erule relcomp_mono, erule relcomp_mono[rotated 1])
   by(rule monoD[OF Relt_mono])
 
+corollary DaC_mono' :
+"mono (DaC_scheme decompose compose)"
+  by (simp add: DaC_mono monoI)
 
 
 text "The synthesis rule will be captured by means of a 'locale' which is
@@ -274,28 +277,21 @@ text "We can thus define the synthesised function and derive relevant properties
 
 definition "dac = (THE \<phi>. lfp(DaC_scheme (graph_of dcmp) (graph_of cmp)) = graph_of \<phi>)"
 
+lemma dac_lfp :
+"graph_of dac = lfp(DaC_scheme (graph_of dcmp) (graph_of cmp))"
+  by (smt (verit, del_insts) DaC_synthesis dac_def graph_of_funct_of theI')
+
 
 lemma dac_unq :
 "lfp (DaC_scheme (graph_of dcmp) (graph_of cmp)) = graph_of f \<Longrightarrow> f = dac"
-  by (smt (verit, ccfv_threshold) dac_def graph_of_funct_of the_equality)
-
-
-lemma dac_lfp :
-"graph_of dac = lfp(DaC_scheme (graph_of dcmp) (graph_of cmp))"
-  using DaC_synthesis dac_unq by fastforce
+  by(rule injD[OF graph_of_inj], simp add: dac_lfp)
 
 
 lemma dac_unfold' :
 "graph_of dac = (graph_of dcmp) \<diamondop> Relt(graph_of dac) \<diamondop> (graph_of cmp)"
-proof -
-  have "graph_of dac = lfp (DaC_scheme (graph_of dcmp) (graph_of cmp))" (is "?l = ?r")
-    by (simp add: dac_lfp)
-  also have "... = DaC_scheme (graph_of dcmp) (graph_of cmp) ?r"
-    by(rule lfp_unfold, rule monoI, rule DaC_mono, simp+)
-  also have "... = DaC_scheme (graph_of dcmp) (graph_of cmp) ?l"
-    by (simp add: dac_lfp)
-  finally show ?thesis by(simp add: DaC_scheme_def)
-qed
+  apply(subst dac_lfp)+
+  apply(subst lfp_unfold, rule DaC_mono') 
+  by(simp add: DaC_scheme_def)
 
 
 lemma dac_unq_function' :
