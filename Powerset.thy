@@ -128,9 +128,14 @@ lemma syn_powerset_corr :
 
 text "Further effects of the restriction of inputs to distinct lists are
        (a) no more list representations will be generated than needed:"
-lemma syn_powerset_length :
-"distinct xs \<Longrightarrow> length(powerset.dac xs) = 2^(length xs)"
+lemma syn_powerset_length' :
+"length(powerset.dac xs) = 2^(length xs)"
   by(induct xs, (simp add: Let_def)+)
+
+lemma syn_powerset_length :
+"distinct xs \<Longrightarrow> length(powerset.dac xs) = 2^(card(set xs))"
+  by (simp add: distinct_card syn_powerset_length')
+
 
 text "and (b) each of the representations is in turn distinct:"
 lemma syn_powerset_distinct :
@@ -170,7 +175,7 @@ lemma pow_tr_corr :
 
 
 lemma pow_tr_length :
-"distinct xs \<Longrightarrow> length(pow_tr xs [[]]) = 2^(length xs)"
+"distinct xs \<Longrightarrow> length(pow_tr xs [[]]) = 2^(card(set xs))"
   by(subst pow_tr, subst syn_powerset_length, simp+)
 
 lemma pow_tr_distinct :
@@ -187,8 +192,9 @@ lemma powerset_repr_corr :
   by(unfold powerset_repr_def, subst pow_tr_corr[THEN sym], simp+)
 
 lemma powerset_repr_length :
-"length(powerset_repr xs) = 2^(length (remdups xs))"
-  by(unfold powerset_repr_def, rule pow_tr_length, simp)
+"length(powerset_repr xs) = 2^(card(set xs))"
+  by (simp add: pow_tr_length powerset_repr_def)
+
 
 lemma powerset_repr_distinct :
 "ys \<in> set(powerset_repr xs) \<Longrightarrow> distinct ys"
