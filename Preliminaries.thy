@@ -1,7 +1,7 @@
-(* ********************************************************************************
+(* ****************************************************************************************
 
-    Theory Preliminaries.thy is part of a package providing supplementary material 
-    to 'Synthesis of Implementations for Divide-and-conquer Specifications'.
+    Theory Preliminaries.thy is part of a package supplementing  
+    'Structured development of implementations for divide-and-conquer specifications'.
     Copyright (c) 2023  M. Bortin
 
     The package is distributed in the hope that it will be useful,
@@ -10,7 +10,8 @@
     For more details see the license agreement (LICENSE) you should have
     received along with the package.
     
-   ******************************************************************************* *)
+   *************************************************************************************** *)
+
 
 theory Preliminaries
 imports Main
