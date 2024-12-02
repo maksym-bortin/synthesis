@@ -485,11 +485,11 @@ lemma greedy_greedy_tr :
   by(induct xs, (clarsimp simp: Let_def greedy_tr_app)+)
 
 corollary transformation2_correctness :
-  "greedy (rev xs) = greedy_tr xs []"
+"greedy (rev xs) = greedy_tr xs []"
   by(subst greedy_greedy_tr[rule_format, where rs="[]", simplified], simp)
 
 
-text "Note that one can also directly show the property:"
+text "Note that one can also directly show the identity:"
 lemma greedy_greedy_tr' :
 "greedy xs = greedy_tr (rev xs) []"
   by(induct xs, (clarsimp simp: Let_def greedy_tr_app)+)
