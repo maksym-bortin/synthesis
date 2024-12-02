@@ -481,16 +481,19 @@ lemma greedy_tr_app[rule_format] :
   
 text "Connection to the function @{term greedy} :"  
 lemma greedy_greedy_tr :
-"\<forall>rs. greedy (xs @ rs) = greedy_tr (rev xs) (greedy rs)"
-  apply(induct_tac xs, clarsimp+)
-  apply(subst greedy_tr_app)
-  by(simp add: Let_def)
-
+"greedy (xs @ rs) = greedy_tr (rev xs) (greedy rs)"
+  by(induct xs, (clarsimp simp: Let_def greedy_tr_app)+)
 
 corollary transformation2_correctness :
   "greedy (rev xs) = greedy_tr xs []"
-  apply(subst greedy_greedy_tr[rule_format, where rs="[]", simplified])
-  by simp
+  by(subst greedy_greedy_tr[rule_format, where rs="[]", simplified], simp)
+
+
+text "Note that one can also directly show the property:"
+lemma greedy_greedy_tr' :
+"greedy xs = greedy_tr (rev xs) []"
+  by(induct xs, (clarsimp simp: Let_def greedy_tr_app)+)
+
 
 
 
