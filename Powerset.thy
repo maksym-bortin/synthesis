@@ -184,7 +184,7 @@ lemma pow_tr_distinct :
   by(subst pow_tr, rule syn_powerset_distinct, simp)
 
 
-text "We can ultimately lift the input restriction to distinct lists as follows
+text "We can ultimately lift the restriction of inputs to distinct lists as follows
       (the function @{term remdups} removes all duplicates):"
 definition "powerset_repr xs = pow_tr (remdups xs) [[]]"
 

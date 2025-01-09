@@ -128,16 +128,19 @@ lemma basis_ext :
 subsection "The duality between maximum and minimum weight bases"
 
 lemma MaxWeightBasis_neg :
-  "max_weight_basis (neg w) G X \<Longrightarrow> min_weight_basis w G X"
+  "max_weight_basis (neg w) G X = min_weight_basis w G X"
   unfolding max_weight_basis_def min_weight_basis_def
   by (metis neg_le_iff_le weight_neg)
 
 
 subsection "The auxiliary lemmas on bases of extended/reduced ground sets"
 
-text "The lemma A1 gets split into two cases."
+text "The lemma A1 gets split into the following two lemmas:"
 lemma A1_1 :
-"basis G X \<Longrightarrow> x \<notin> G \<Longrightarrow> {x} \<union> X \<in> \<I> \<Longrightarrow> basis ({x} \<union> G) ({x} \<union> X)"
+"basis G X \<Longrightarrow> {x} \<union> X \<in> \<I> \<Longrightarrow> basis ({x} \<union> G) ({x} \<union> X)"
+  apply(case_tac "x \<in> X")
+   apply(frule basisD2)
+   apply (metis le_sup_iff singleton_eq sup.absorb2)
   apply(subst basis_def, simp)
   apply(frule basisD1)
   apply clarsimp
@@ -149,11 +152,15 @@ lemma A1_1 :
   apply(drule_tac X'="A - {x}" in basisD3)
     apply fast
    apply(erule_tac S=A in Independent_D2[OF independence], fast)
-  by (smt (verit) Diff_insert2 Diff_insert_absorb Diff_mono Diff_subset One_nat_def add_diff_inverse_nat card_Diff_singleton_if card_Diff_subset card_mono card_seteq diff_is_0_eq' diff_shunt_var double_diff dual_order.eq_iff finite.insertI finite_subset leI le_trans less_Suc_eq_le plus_1_eq_Suc)
+  apply(case_tac "x \<in> A")
+   apply (simp add: finite_subset)+
+  done
 
 
 lemma A1_2 :
-"basis G X \<Longrightarrow> x \<notin> G \<Longrightarrow> {x} \<union> X \<notin> \<I> \<Longrightarrow> basis ({x} \<union> G) X"
+"basis G X \<Longrightarrow> {x} \<union> X \<notin> \<I> \<Longrightarrow> basis ({x} \<union> G) X"
+  apply(case_tac "x \<in> G")
+   apply (simp add: singleton_eq subset_Un_eq)
   apply(subst basis_def, simp)
   apply(frule basisD1)
   apply clarsimp
@@ -214,7 +221,7 @@ end (* the finite matroids locale *)
 
 
   
-section "Synthesis of greedy algorithms on lists with weighted elements"
+section "A greedy tactic for lists with weighted elements"
 
 
 locale language_struct =
@@ -244,7 +251,8 @@ locale greedy_tactic = language_struct +
   assumes \<L>_img_independence : "Independent \<L>_img"
 begin
 
-text "In addition to the language-struct locale we assume that the ground set elements are weighted
+text "In addition to the language-struct locale we assume that the elements of type @{typ 'a} 
+      are weighted by the function @{term w}
       and that @{term \<L>_img} forms a family of independent sets so we can interpret the finite 
       matroids locale in this context."
 interpretation fm : finite_matroids \<L>_img
