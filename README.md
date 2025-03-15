@@ -1,7 +1,7 @@
 This repository contains the material accompanying the publication
 'Structured development of implementations for divide-and-conquer specifications'[https://doi.org/10.1016/j.scico.2023.103011],
 and comprises the following theories for the Isabelle/HOL theorem prover 
-(versions 2024, 2023 and 2022, see www.cl.cam.ac.uk/research/hvg/Isabelle and LICENSE for details):
+(versions 2022 to 2025, see www.cl.cam.ac.uk/research/hvg/Isabelle and LICENSE for details):
 
  - Preliminaries.thy  -- the underlying framework
  - DaC_synthesis.thy  -- the divide-and-conquer design tactic with the relator deployed in the publication
