@@ -304,12 +304,14 @@ theorem prefixed_point_property :
    apply(frule fm.A3, assumption+)
    apply(erule disjE)
     apply(drule_tac x="Y - {a}" in spec, drule mp, assumption)
-    apply (smt (verit, ccfv_threshold) fm.basis_def DiffE Diff_insert_absorb weight_remove in_mono infinite_super insert_iff)
+    apply(subgoal_tac "w a + weight w (Y - {a}) \<le> w a + weight w X")
+     apply (metis Diff_insert_absorb finite_subset fm.basis_def insertCI subset_Diff_insert weight_remove)
+    apply linarith
    apply clarsimp
    apply(drule fm.basis_card_eq, assumption)+
-   apply(subgoal_tac "card (insert x' (Y - {a})) = card Y")
-    apply (metis Diff_insert_absorb card_Diff1_less_iff card_Diff_singleton_if finite_insert finite_matroids.basisD1 finite_subset fm.finite_matroids_axioms insertCI subset_Diff_insert)
-   apply (metis DiffE card.infinite card.insert_remove card_insert_if finite.emptyI finite_Diff2 finite_insert)
+   apply(subgoal_tac "card X = card Y")
+    apply (metis card_Suc_eq_finite fm.basis_def infinite_super n_not_Suc_n subset_Diff_insert)
+   apply (metis Diff_iff card.remove card_Suc_eq_finite finite_Diff finite_subset fm.basis_def)
   apply(clarsimp simp: greedy_spec_def fm.max_weight_basis_def)
   apply(rename_tac X a)
   apply(frule_tac x=a in fm.A1_2, simp+)
@@ -337,7 +339,7 @@ theorem prefixed_point_property :
   by simp
 
 
-text "We apply the divide-and-conquer synthesis rule as follows:" 
+text "applying the divide-and-conquer synthesis rule:" 
 interpretation greedy: DaC_synthesis 
 "{(xs, set xs) |xs. distinct xs \<and> Sorted w xs}"                 (* \<alpha>\<^sub>1 *)
 "{(xs, set xs) |xs. distinct xs}"                               (* \<alpha>\<^sub>2 *)
