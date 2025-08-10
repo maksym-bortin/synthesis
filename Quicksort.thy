@@ -21,15 +21,15 @@ begin
 section "Deriving Quicksort"
 
 text "To underline that the basic principles remain the same,
-      the divide-and-conquer tactic will be applied to derive
-      the well-known quicksort algorithm."
+      the divide-and-conquer tactic shall be applied below
+      to derive the well-known quicksort algorithm."
 
 interpretation quicksort: DaC_synthesis 
 "{(xs, xs) |xs. distinct xs}"                 (* \<alpha>\<^sub>1 *)
 "Id"                                          (* \<alpha>\<^sub>2 *)
 
 (* the specification of sorting on distinct lists: *)
-"{(il, ol). set il = set ol \<and> distinct ol \<and> Sorted id ol}"          
+"{(il, ol). set il = set ol \<and> distinct ol \<and> sorted ol}"          
 
 (* decomposition specification: *)
 "{([], Empty)} \<union> {(x#xs, Dcmp x l r) |x xs l r. set xs = set(l@r) \<and> (\<forall>a\<in>set l. a < x) \<and> (\<forall>a\<in>set r. x < a)}"
@@ -50,21 +50,23 @@ interpretation quicksort: DaC_synthesis
   apply(unfold_locales)
      apply(clarsimp simp: Relt_def DaC_scheme_def)
      apply(erule disjE, clarsimp+)
-     using Sorted_append apply fastforce
-       apply(clarsimp simp: graph_of_def Relt_def)
-       apply(case_tac xs, fastforce)
-       apply clarsimp
-       apply(rename_tac x xs)
-       apply(rule_tac b="Dcmp x (filter ((>) x) xs) (filter ((<) x) xs)" in relcompI)
-        apply simp
-        apply(rule set_eqI)
+     apply(rule conjI, fastforce)+
+     apply(subst sorted_wrt_append, fastforce)
+    apply(clarsimp simp: graph_of_def Relt_def)
+    apply(case_tac xs, fastforce)
+    apply clarsimp
+    apply(rename_tac x xs)
+    apply(rule_tac b="Dcmp x (filter ((>) x) xs) (filter ((<) x) xs)" in relcompI)
+     apply simp
+     apply(rule set_eqI)
      using linorder_neq_iff apply fastforce
        apply clarsimp
       apply(clarsimp simp: graph_of_def Relt_def)
       apply(rename_tac x)
       apply(case_tac x, fastforce)
       apply clarsimp
-      apply(rule_tac b="Dcmp x21 x22 x23" in relcompI, fast, simp)
+      apply(rename_tac x l r)
+      apply(rule_tac b="Dcmp x l r" in relcompI, fast, simp)
      apply clarsimp
      apply(rename_tac xs)
      apply(induct_tac xs rule: length_induct, clarsimp)
@@ -101,7 +103,7 @@ lemma quicksort_eqs :
 
 lemma quicksort_impl :
 "distinct xs \<Longrightarrow>
- set(quicksort.dac xs) = set xs \<and> distinct(quicksort.dac xs) \<and> Sorted id (quicksort.dac xs)"
+ set(quicksort.dac xs) = set xs \<and> distinct(quicksort.dac xs) \<and> sorted (quicksort.dac xs)"
   apply(insert quicksort.dac_impl)
   apply(drule_tac c="(xs, quicksort.dac xs)" in subsetD)
    apply(rule_tac b=xs in relcompI, simp)

@@ -160,35 +160,30 @@ lemma lfp_fusion :
 
 subsection "Sorted lists"
 
-fun Sorted :: "('a \<Rightarrow> 'b :: linorder) \<Rightarrow> 'a list \<Rightarrow> bool"
-where "Sorted f [] = True" |
-      "Sorted f (x # xs) = (Sorted f xs \<and> (\<forall>z \<in> set xs. f x \<le> f z))"
-
-lemma Sorted_append:
-  "Sorted f (xs@ys) = (Sorted f xs \<and> Sorted f ys \<and> (\<forall>x\<in>set xs. \<forall>y\<in>set ys. f x \<le> f y))"
-  by(induct xs arbitrary:ys, simp+, blast)
+definition sorted_by :: "('a \<Rightarrow> 'b :: linorder) \<Rightarrow> 'a list \<Rightarrow> bool"
+where "sorted_by f = sorted_wrt (\<lambda>a b. f a \<le> f b)"
 
 
-lemma Sorted_rem1 :
-"Sorted f xs \<Longrightarrow> Sorted f (remove1 x xs)"
-  apply(induct xs, simp_all)
-  apply clarsimp
-  apply(drule_tac x=z in bspec)
-   apply(erule subsetD[OF set_remove1_subset])
-  by assumption
+lemma sorted_by_Cons:
+"sorted_by f (x#xs) = (sorted_by f xs \<and> (\<forall>a\<in>set xs. f x \<le> f a))"
+  by(fastforce simp add: sorted_by_def)
 
+lemma sorted_by_append:
+"sorted_by f (xs@ys) = (sorted_by f xs \<and> sorted_by f ys \<and> (\<forall>x\<in>set xs. \<forall>y\<in>set ys. f x \<le> f y))"
+  by(simp add: sorted_by_def sorted_wrt_append)
 
-lemma Sorted_filter :
-"Sorted f xs \<Longrightarrow> Sorted f (filter P xs)"
-  by(induct xs, simp_all)
+lemma sorted_by_rem1 :
+"sorted_by f xs \<Longrightarrow> sorted_by f (remove1 x xs)"
+  by (metis sorted_by_def sorted_map_remove1 sorted_wrt_map)
 
+lemma sorted_by_filter :
+"sorted_by f xs \<Longrightarrow> sorted_by f (filter P xs)"
+  by(simp add: sorted_by_def sorted_wrt_filter)
 
-lemma Sorted_nth :
-"j < length xs \<Longrightarrow> i \<le> j \<Longrightarrow> Sorted f xs \<Longrightarrow> f(xs!i) \<le> f(xs!j)"
-  apply(induct xs arbitrary:i j, clarsimp+)
-  apply(case_tac j, clarsimp+)
-  apply(case_tac i, clarsimp+)
-  done
+lemma sorted_by_nth :
+"j < length xs \<Longrightarrow> i \<le> j \<Longrightarrow> sorted_by f xs \<Longrightarrow> f(xs!i) \<le> f(xs!j)"
+  by (metis sorted_by_def dual_order.refl nat_less_le sorted_wrt_iff_nth_less)
+
 
 
 subsection "A few more auxiliaries"

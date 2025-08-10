@@ -66,15 +66,15 @@ lemma adm'_drop :
   
 
 lemma adm'_rem1 :
-"adm' (Suc d) (remove1 a xs) \<Longrightarrow> d \<le> date a \<Longrightarrow> a \<in> set xs \<Longrightarrow> Sorted date xs \<Longrightarrow> 
+"adm' (Suc d) (remove1 a xs) \<Longrightarrow> d \<le> date a \<Longrightarrow> a \<in> set xs \<Longrightarrow> sorted_by date xs \<Longrightarrow> 
  adm' d xs"
   apply(induct xs arbitrary:d)
-   apply simp_all
-  by (smt (verit, ccfv_SIG) Suc_eq_plus1 Suc_le_eq adm'.simps(2) le_eq_less_or_eq linorder_not_le)
+   apply(simp_all add: sorted_by_def split: if_splits)
+  by fastforce
 
 
 lemma adm'_subset :
-"Sorted date xs \<Longrightarrow> set xs \<subseteq> set xs' \<Longrightarrow>
+"sorted_by date xs \<Longrightarrow> set xs \<subseteq> set xs' \<Longrightarrow>
  distinct xs \<Longrightarrow> adm' d xs' \<Longrightarrow> d' \<le> d \<Longrightarrow>
  adm' d' xs" 
   apply(induct xs' arbitrary:xs d d', simp)
@@ -84,7 +84,7 @@ lemma adm'_subset :
    apply(drule_tac x="remove1 x xs" in meta_spec)
    apply(drule_tac x="Suc d" in meta_spec)
    apply(drule_tac x="Suc d'" in meta_spec)
-   apply(drule meta_mp, erule Sorted_rem1)
+   apply(drule meta_mp, erule sorted_by_rem1)
    apply(drule meta_mp, fastforce)
    apply(drule meta_mp, erule distinct_remove1)
    apply simp
@@ -99,13 +99,13 @@ lemma adm'_subset :
  
 
 corollary adm'_subset' :
-"Sorted date xs \<Longrightarrow> set xs \<subseteq> set xs' \<Longrightarrow> distinct xs \<Longrightarrow> adm' d xs' \<Longrightarrow>
-  adm' d xs"
+"sorted_by date xs \<Longrightarrow> set xs \<subseteq> set xs' \<Longrightarrow> distinct xs \<Longrightarrow> adm' d xs' \<Longrightarrow>
+ adm' d xs"
   by(erule adm'_subset, simp+)
 
 
 lemma adm' :
-"adm' d xs \<Longrightarrow> Sorted date xs' \<Longrightarrow> set xs = set xs' \<Longrightarrow> distinct xs' \<Longrightarrow>
+"adm' d xs \<Longrightarrow> sorted_by date xs' \<Longrightarrow> set xs = set xs' \<Longrightarrow> distinct xs' \<Longrightarrow>
  adm' d xs'"
   by(erule adm'_subset'[rotated 2], assumption+, simp)
 
@@ -124,35 +124,35 @@ fun ins :: "job \<Rightarrow> job list \<Rightarrow> job list"
   "ins j (x#xs) = (if date j \<le> date x then j#x#xs else x#(ins j xs))"
 
 lemma ins_length[simp] :
-  "length (ins x xs) = 1 + length xs"
+"length (ins x xs) = 1 + length xs"
   by(induct xs, simp_all)
 
 
 lemma ins_set[simp] :
-  "set(ins x xs) = set(x#xs)"
+"set(ins x xs) = set(x#xs)"
   by(induct xs, simp_all, fastforce)
 
 lemma set_ins_fold[simp] :
-  "set(foldr ins xs []) = set xs"
+"set(foldr ins xs []) = set xs"
   by(induct xs, simp_all)
 
 lemma sorted_ins :
-  "Sorted date xs \<Longrightarrow> Sorted date (ins x xs)"
-  by(induct xs, simp_all, fastforce)
+"sorted_by date xs \<Longrightarrow> sorted_by date (ins x xs)"
+  by(induct xs, simp_all add: sorted_by_def, fastforce)
   
 lemma ins_sorted :
-  "Sorted date (foldr ins xs [])"
-  by(induct xs, simp_all, erule sorted_ins)
+"sorted_by date (foldr ins xs [])"
+  by(induct xs, simp_all add: sorted_by_def, fold sorted_by_def, erule sorted_ins)
 
 lemma ins_dist :
- "distinct xs \<Longrightarrow> x \<notin> set xs \<Longrightarrow> distinct (ins x xs)"
-by(induct xs, simp_all, fast) 
+"distinct xs \<Longrightarrow> x \<notin> set xs \<Longrightarrow> distinct (ins x xs)"
+  by(induct xs, simp_all, fast) 
+
 
 lemma dist_ins_fold :
-  "distinct xs \<Longrightarrow> distinct(foldr ins xs [])"
+"distinct xs \<Longrightarrow> distinct(foldr ins xs [])"
   apply(induct xs, simp_all)
-  apply(erule ins_dist, clarsimp)
-  done
+  by(erule ins_dist, clarsimp)
 
 
 
@@ -163,14 +163,14 @@ definition "\<L>_job = {xs. foldr ins xs [] \<in> adm}"
 
 
 lemma \<L>_jobD :
-  "distinct xs \<Longrightarrow> xs \<in> \<L>_job \<Longrightarrow> 
-   \<exists>xs'. distinct xs' \<and> Sorted date xs' \<and> adm' 1 xs' \<and> set xs' = set xs"
+"distinct xs \<Longrightarrow> xs \<in> \<L>_job \<Longrightarrow> 
+ \<exists>xs'. distinct xs' \<and> sorted_by date xs' \<and> adm' 1 xs' \<and> set xs' = set xs"
   apply(clarsimp simp: \<L>_job_def adm_def)
   using dist_ins_fold ins_sorted set_ins_fold by blast
 
 
 lemma adm'_\<L>_job :
-  "adm' 1 xs \<Longrightarrow> distinct xs \<Longrightarrow> xs \<in> \<L>_job"
+"adm' 1 xs \<Longrightarrow> distinct xs \<Longrightarrow> xs \<in> \<L>_job"
   apply(clarsimp simp: \<L>_job_def adm_def)
   using adm' dist_ins_fold ins_sorted set_ins_fold by blast
 
@@ -180,10 +180,10 @@ lemma adm'_\<L>_job :
 
 
 lemma job_Independent :
-"Independent (language_struct.\<L>_img \<L>_job)"
-proof(subst language_struct.\<L>_img_def)
-  show "language_struct \<L>_job"
-    by (simp add: \<L>_job_def adm' adm_def dist_ins_fold ins_sorted language_struct_def)
+"Independent (language.\<L>_img \<L>_job)"
+proof(subst language.\<L>_img_def)
+  show "language \<L>_job"
+    by (simp add: \<L>_job_def adm' adm_def dist_ins_fold ins_sorted language_def)
 next
   show "Independent {set xs |xs. distinct xs \<and> xs \<in> \<L>_job}"
   proof(simp add: Independent_def, intro conjI, simp add: \<L>_job_def adm_def, 
@@ -212,12 +212,12 @@ next
     assume d: "distinct ys'"
     assume e: "distinct xs'"
 
-    have "\<exists>xs. distinct xs \<and> Sorted date xs \<and> adm' 1 xs \<and> set xs = set xs'"
+    have "\<exists>xs. distinct xs \<and> sorted_by date xs \<and> adm' 1 xs \<and> set xs = set xs'"
       by(rule \<L>_jobD, rule e, rule a)
-    then obtain xs where 1: "distinct xs \<and> Sorted date xs \<and> adm' 1 xs \<and> set xs = set xs'" ..
-    have "\<exists>xs. distinct xs \<and> Sorted date xs \<and> adm' 1 xs \<and> set xs = set ys'"
+    then obtain xs where 1: "distinct xs \<and> sorted_by date xs \<and> adm' 1 xs \<and> set xs = set xs'" ..
+    have "\<exists>xs. distinct xs \<and> sorted_by date xs \<and> adm' 1 xs \<and> set xs = set ys'"
       by(rule \<L>_jobD, rule d, rule b)
-    then obtain ys where 2: "distinct ys \<and> Sorted date ys \<and> adm' 1 ys \<and> set ys = set ys'" ..
+    then obtain ys where 2: "distinct ys \<and> sorted_by date ys \<and> adm' 1 ys \<and> set ys = set ys'" ..
     with 1 and c have c' : "card(set xs) < card(set ys)" 
       by simp
     have "\<exists>x. x \<in> set ys \<and> x \<notin> set xs"
@@ -308,7 +308,7 @@ next
        show "?xsL @ ?e # ?xsR \<in> \<L>_job"
        proof(rule adm'_\<L>_job[OF _ ext_dist], rule adm'_comp)
          show "adm' 1 ?xsL"
-           by(rule_tac xs'=xs in adm'_subset', rule Sorted_filter, simp add: 1, fastforce, 
+           by(rule_tac xs'=xs in adm'_subset', rule sorted_by_filter, simp add: 1, fastforce, 
                (simp add: 1[simplified])+)
        next
          show "adm' (1 + length ?xsL) (?e # ?xsR)"
@@ -317,8 +317,9 @@ next
          next
            show "distinct (?e # ?xsR)" using distinct_append ext_dist by blast
          next
-           show "Sorted date (?e # ?xsR)"
-             by(simp, rule conjI, rule Sorted_filter, (clarsimp simp: 1)+, rule Sorted_nth, (simp add: 2)+)
+           show "sorted_by date (?e # ?xsR)"
+             by(simp add: sorted_by_Cons, rule conjI, rule sorted_by_filter, (clarsimp simp: 1)+, 
+                rule sorted_by_nth, (simp add: 2)+)
          qed
        qed
      qed(rule ext_dist)
@@ -373,7 +374,7 @@ lemma example_conclusion :
 "scheduling.max_weight_basis w_job {j\<^sub>1, j\<^sub>4, j\<^sub>3, j\<^sub>2} {j\<^sub>4, j\<^sub>1}"
   apply(subgoal_tac "distinct [j\<^sub>1, j\<^sub>4, j\<^sub>3, j\<^sub>2]")
    apply(drule opt_scheduling)
-    apply(simp add: j\<^sub>1_def j\<^sub>2_def j\<^sub>3_def j\<^sub>4_def neg_def w_job_def)
+    apply(simp add: j\<^sub>1_def j\<^sub>2_def j\<^sub>3_def j\<^sub>4_def neg_def w_job_def sorted_by_def)
    apply(subst (asm) example_eval)
   apply simp
   apply(simp add: j\<^sub>1_def j\<^sub>2_def j\<^sub>3_def j\<^sub>4_def)
