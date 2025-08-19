@@ -30,20 +30,20 @@ definition Relt :: "'a \<rightarrow> 'b \<Rightarrow> ('v, 'a) Relt \<rightarrow
                     {(Dcmp x A A', Dcmp x B B') |x A B A' B'. (A, B) \<in> r \<and> (A', B') \<in> r}"
 
 
-subsection "The relator axioms"
+subsection "Showing the relator axioms"
 
 lemma Relt_mono:
-  "mono Relt"
+"mono Relt"
   unfolding Relt_def
   by(rule monoI, fast)
 
 lemma Relt_comp:
-  "Relt r \<diamondop> Relt s = Relt (r \<diamondop> s)"
+"Relt r \<diamondop> Relt s = Relt (r \<diamondop> s)"
   unfolding Relt_def
   by(rule equalityI, blast+)
   
 lemma Relt_Id:
-  "Relt Id = Id"
+"Relt Id = Id"
   unfolding Relt_def  
   by (clarsimp, rule set_eqI, smt (verit, best) IdE IdI Relt.exhaust insert_iff mem_Collect_eq)
   
@@ -61,7 +61,7 @@ lemma Relt_conv_eq :
 
 lemma Relt_simple : 
 "simple r \<Longrightarrow> simple(Relt r)"
-  by (metis (no_types, opaque_lifting) Relt_Id Relt_comp Relt_conv_eq Relt_mono monoD simple_def)
+  by (metis Relt_Id Relt_comp Relt_conv_eq Relt_mono monoD simple_def)
 
 lemma Relt_entire :
 "entire r \<Longrightarrow> entire(Relt r)"
@@ -91,7 +91,7 @@ lemma ReltF :
   by (metis ReltF_def Relt_graph_of graph_of_funct_of)
 
 
-text "the functor axioms:"
+text "showing the functor axioms:"
 
 lemma ReltF1 :
 "ReltF id = id"
@@ -99,12 +99,12 @@ lemma ReltF1 :
 
 
 lemma ReltF2 :
-  "ReltF (g \<circ> f) = ReltF g \<circ> ReltF f"
+"ReltF (g \<circ> f) = ReltF g \<circ> ReltF f"
   by (metis ReltF Relt_comp graph_of_comp graph_of_funct_of)
 
 
 
-text "Note that we actually just copy-and-paste the respective section
+text "Note that the remainder is actually just copied
       from the theory DaC-synthesis.thy"
 
 definition
@@ -265,6 +265,7 @@ theorem DaC_synthesis :
   by fast
 
 
+
 definition "dac = (THE \<phi>. lfp(DaC_scheme (graph_of dcmp) (graph_of cmp)) = graph_of \<phi>)"
 
 
@@ -278,34 +279,44 @@ lemma dac_unq :
   by(rule injD[OF graph_of_inj], simp add: dac_lfp)
 
 
-lemma dac_unfold' :
-"graph_of dac = (graph_of dcmp) \<diamondop> Relt(graph_of dac) \<diamondop> (graph_of cmp)"
-  apply(subst dac_lfp)+
-  apply(subst lfp_unfold, rule DaC_mono') 
-  by(simp add: DaC_scheme_def)
-
-
-lemma dac_unq_function' :
-"(graph_of dcmp) \<diamondop> Relt(graph_of f) \<diamondop> (graph_of cmp) \<subseteq> graph_of f \<Longrightarrow> dac = f"
-  by (simp add: DaC_scheme_def dac_lfp graph_of_sub lfp_lowerbound)
-
-
 lemma dac_unfold :
 "dac = cmp \<circ> ReltF dac \<circ> dcmp"
-  by (metis ReltF dac_lfp dac_unfold' dac_unq graph_of_comp)
+  apply(rule sym, rule graph_of_sub)
+  apply(simp add: graph_of_comp ReltF[THEN sym])
+  by (metis DaC_mono' DaC_scheme_def dac_lfp lfp_unfold subsetI)
 
 
 lemma dac_unq_function :
 "f = cmp \<circ> ReltF f \<circ> dcmp \<Longrightarrow> f = dac"
-  by (metis ReltF dac_unq_function' graph_of_comp subset_refl)
-  
+  apply(rule sym, rule graph_of_sub)
+  apply(drule_tac f=graph_of in arg_cong)
+  apply(simp add: graph_of_comp ReltF[THEN sym])
+  by (simp add: DaC_scheme_def dac_lfp lfp_lowerbound)
+
 
 lemma dac_impl :
 "\<alpha>\<^sub>1\<^sup>\<circ> \<diamondop> (graph_of dac) \<diamondop> \<alpha>\<^sub>2 \<subseteq> spec"
   by (simp add: DaC_impl dac_lfp)
 
 
-end  (* the synthesis tactic *)
+lemma dac_impl_inversion :
+"simple spec \<Longrightarrow> entire \<alpha>\<^sub>2 \<Longrightarrow> \<alpha>\<^sub>1 \<diamondop> spec \<subseteq> (graph_of dac) \<diamondop> \<alpha>\<^sub>2"
+  apply clarsimp
+  apply(rename_tac u v w)
+  apply(simp add: entire_def)
+  apply(drule_tac c="(dac u, dac u)" in subsetD, clarsimp+)
+  apply(rename_tac w')
+  apply(subgoal_tac "(v, w') \<in> spec")
+   apply(simp add: simple_def)
+   apply(drule_tac c="(w, w')" in subsetD, fast)
+   apply clarsimp
+   apply (meson converse_iff graph_of_eqD relcomp.simps)
+  apply(rule subsetD[OF dac_impl])
+  apply (meson converse_iff graph_of_eqD relcomp.simps)
+  done
+
+
+end  (* the divide-and-conquer tactic *)
 
 end
 
