@@ -157,14 +157,13 @@ lemma pow_tr_app :
 "pow_tr (xs @ ys) rs = pow_tr ys (pow_tr xs rs)"
   by(induct xs arbitrary: rs, simp+)
 
-
-lemma dac_pow_tr :
-"powerset.dac (xs @ ys) = pow_tr (rev xs) (powerset.dac ys)"
-  by(induct xs arbitrary: ys, simp_all add: Let_def pow_tr_app)
+lemma pow_tr_dac_eq :
+"pow_tr (rev xs) [[]] = powerset.dac xs"
+  by(induct xs, simp_all add: Let_def pow_tr_app)
 
 corollary pow_tr :
 "pow_tr xs [[]] = powerset.dac (rev xs)"
-  by (metis append_Nil2 dac_pow_tr rev_rev_ident syn_powerset_eqs(1))
+  by (metis pow_tr_dac_eq rev_swap)
 
 
 text "The correctness of @{term pow_tr} now follows straight:" 
