@@ -70,10 +70,10 @@ lemma Relt_entire :
 
 lemma Relt_graph_of :
 "\<exists>g. Relt(graph_of f) = graph_of g"
-  apply(subgoal_tac "simple (graph_of f)")
-  apply(subgoal_tac "entire (graph_of f)")
-  apply (simp add: Relt_entire Relt_simple mapping)
-  by(simp add: graph_of_def simple_def entire_def, fast)+
+  apply(subgoal_tac "simple (graph_of f) \<and> entire (graph_of f)")
+   apply (simp add: Relt_entire Relt_simple mapping)
+  by(simp add: graph_of_def simple_def entire_def, fast)
+
 
 
 subsubsection "The induced endofunctor"
@@ -113,8 +113,7 @@ definition
 lemma DaC_mono :
 "decompose \<subseteq> decompose' \<Longrightarrow> compose \<subseteq> compose' \<Longrightarrow> r \<subseteq> r' \<Longrightarrow> 
  DaC_scheme decompose compose r \<subseteq> DaC_scheme decompose' compose' r'"
-proof(simp add: DaC_scheme_def, erule relcomp_mono, erule relcomp_mono[rotated 1])
-qed(rule monoD[OF Relt_mono])
+  by(simp add: DaC_scheme_def relcomp_mono Relt_mono monoD)
 
 
 corollary DaC_mono' :
@@ -142,7 +141,7 @@ begin
 
 
 lemma DaC_simple :
-"simple d \<Longrightarrow> simple c \<Longrightarrow> simple (lfp (DaC_scheme d c))"
+"simple d \<Longrightarrow> simple c \<Longrightarrow> simple (lfp(DaC_scheme d c))"
   apply(simp add: simple_def)
   apply(subst rdiv_univ)
   apply(rule lfp_lowerbound)
@@ -176,7 +175,7 @@ lemma DaC_simple :
 
 
 lemma DaC_entire :
-"entire c \<Longrightarrow> entire(lfp(DaC_scheme (graph_of dcmp) c))"
+"entire c \<Longrightarrow> entire (lfp(DaC_scheme (graph_of dcmp) c))"
   apply(simp add: entire_def)
   apply(rule subset_trans, rule reduct)
   apply(rule_tac H="\<lambda>x. x \<diamondop> x\<^sup>\<circ>" in lfp_fusion)
