@@ -113,8 +113,9 @@ definition
 lemma DaC_mono :
 "decompose \<subseteq> decompose' \<Longrightarrow> compose \<subseteq> compose' \<Longrightarrow> r \<subseteq> r' \<Longrightarrow> 
  DaC_scheme decompose compose r \<subseteq> DaC_scheme decompose' compose' r'"
-  apply(simp add: DaC_scheme_def, erule relcomp_mono, erule relcomp_mono[rotated 1])
-  by(rule monoD[OF Relt_mono])
+proof(simp add: DaC_scheme_def, erule relcomp_mono, erule relcomp_mono[rotated 1])
+qed(rule monoD[OF Relt_mono])
+
 
 corollary DaC_mono' :
 "mono (DaC_scheme decompose compose)"
@@ -281,9 +282,10 @@ lemma dac_unq :
 
 lemma dac_unfold :
 "dac = cmp \<circ> ReltF dac \<circ> dcmp"
-  apply(rule sym, rule graph_of_sub)
+  apply(rule injD[OF graph_of_inj])
   apply(simp add: graph_of_comp ReltF[THEN sym])
-  by (metis DaC_mono' DaC_scheme_def dac_lfp lfp_unfold subsetI)
+  by (metis DaC_mono' DaC_scheme_def dac_lfp lfp_unfold)
+
 
 
 lemma dac_unq_function :
